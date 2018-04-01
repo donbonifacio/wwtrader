@@ -1,0 +1,6 @@
+[package]
+name = "engine"
+version = "0.1.0"
+authors = ["Pedro Santos <donbonifacio@gmail.com>"]
+
+[dependencies]
