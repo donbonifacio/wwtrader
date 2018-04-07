@@ -1,23 +1,22 @@
+
+use models::coordinate::Coordinate;
+use models::direction;
+use models::direction::Direction;
 use models::world::World;
 use actions::action::{ActionData, ActionType};
-
-const LEFT: [i8; 2] = [-1, 0];
-const RIGHT: [i8; 2] = [1, 0];
-const UP: [i8; 2] = [0, -1];
-const DOWN: [i8; 2] = [0, 1];
 
 pub fn left(entity_id: i32) -> ActionData {
     ActionData {
         entity_id: entity_id,
         action_type: ActionType::Move,
-        direction: Some(LEFT) }
+        direction: Some(direction::LEFT) }
 }
 
 pub fn right(entity_id: i32) -> ActionData {
     ActionData {
         entity_id: entity_id,
         action_type: ActionType::Move,
-        direction: Some(RIGHT)
+        direction: Some(direction::RIGHT)
     }
 }
 
@@ -25,7 +24,7 @@ pub fn up(entity_id: i32) -> ActionData {
     ActionData {
         entity_id: entity_id,
         action_type: ActionType::Move,
-        direction: Some(UP)
+        direction: Some(direction::UP)
     }
 }
 
@@ -33,19 +32,24 @@ pub fn down(entity_id: i32) -> ActionData {
     ActionData {
         entity_id: entity_id,
         action_type: ActionType::Move,
-        direction: Some(DOWN)
+        direction: Some(direction::DOWN)
     }
 }
 
 fn process(world: &mut World, action: ActionData) {
     if let Some(entity) = world.get_entity(action.entity_id) {
         if let Some(dir) = action.direction {
-            let coord = entity.coord.operate(dir);
+            let coord = operate(entity.coord, dir);
             let new_entity = entity.with_coordinate(coord);
             world.update_entity(new_entity);
         }
     }
 }
+
+pub fn operate(coord: Coordinate, direction: Direction) -> Coordinate {
+    Coordinate { x: coord.x + direction.dx, y: coord.y + direction.dy }
+}
+
 
 #[cfg(test)]
 mod tests {

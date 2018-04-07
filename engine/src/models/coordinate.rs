@@ -12,10 +12,6 @@ impl Coordinate {
         Coordinate { x: x, y: y }
     }
 
-    pub fn operate(&self, offset: [i8; 2]) -> Coordinate {
-        Coordinate { x: self.x + offset[0], y: self.y + offset[1] }
-    }
-
     pub fn is_adjacent(self, other: Coordinate) -> bool {
         let dx: i8 = self.x - other.x;
         let dy: i8 = self.y - other.y;

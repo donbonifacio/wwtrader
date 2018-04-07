@@ -1,4 +1,5 @@
 use models::world::World;
+use models::direction::Direction;
 
 #[derive(Clone, Debug, Copy)]
 pub enum ActionType {
@@ -10,5 +11,5 @@ pub enum ActionType {
 pub struct ActionData {
     pub entity_id: i32,
     pub action_type: ActionType,
-    pub direction: Option<[i8; 2]>
+    pub direction: Option<Direction>
 }
