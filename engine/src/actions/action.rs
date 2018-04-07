@@ -3,8 +3,7 @@ use models::direction::Direction;
 
 #[derive(Clone, Debug, Copy)]
 pub enum ActionType {
-    Move,
-    Sleep
+    Move
 }
 
 #[derive(Clone, Debug, Copy)]

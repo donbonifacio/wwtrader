@@ -9,7 +9,8 @@ pub fn left(entity_id: i32) -> ActionData {
     ActionData {
         entity_id: entity_id,
         action_type: ActionType::Move,
-        direction: Some(direction::LEFT) }
+        direction: Some(direction::LEFT)
+    }
 }
 
 pub fn right(entity_id: i32) -> ActionData {
@@ -36,8 +37,9 @@ pub fn down(entity_id: i32) -> ActionData {
     }
 }
 
-fn process(world: &mut World, action: ActionData) {
+pub fn process(world: &mut World, action: ActionData) {
     if let Some(entity) = world.get_entity(action.entity_id) {
+        println!("-------------- {} {} {}", entity.id, entity.coord.x, entity.coord.y);
         if let Some(dir) = action.direction {
             let coord = operate(entity.coord, dir);
             let new_entity = entity.with_coordinate(coord);

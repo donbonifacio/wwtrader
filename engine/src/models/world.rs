@@ -45,6 +45,14 @@ impl World {
     pub fn has_actions(&self) -> bool {
         self.actions.len() > 0
     }
+
+    pub fn clear_actions(&mut self) {
+        self.actions.clear()
+    }
+
+    pub fn get_actions(&self) -> &Vec<ActionData> {
+        &self.actions
+    }
 }
 
 #[cfg(test)]
