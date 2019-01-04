@@ -34,6 +34,14 @@ impl World {
         }
     }
 
+    pub fn create(w: usize, h: usize) -> World {
+        World {
+            size_x: w,
+            size_y: h,
+            ..Default::default()
+        }
+    }
+
     pub fn get_entity(&self, entity_id: i32) -> Option<Entity> {
         self.entities.get(&entity_id).map(|e| e.clone())
     }

@@ -1,9 +1,9 @@
 
 use models::coordinate::Coordinate;
 
-#[derive(Clone, Debug, Copy)]
+#[derive(Clone, Debug, Copy, PartialEq)]
 pub enum EntityType {
-    Player(i32),
+    Player(i8),
     Enemy(char),
     Obstacle(char),
     Hole(char)
