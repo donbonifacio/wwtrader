@@ -1,30 +1,47 @@
 
 use std::collections::{HashMap};
-use std::any::{Any, TypeId};
 
 use models::entity::Entity;
 use models::coordinate::Coordinate;
 use actions::action::ActionData;
-use actions::movement;
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct World {
     current_id: i32,
+    pub size_x: usize,
+    pub size_y: usize,
     entities: HashMap<i32, Entity>,
     actions: Vec<ActionData>
+}
+
+impl Default for World {
+    fn default() -> World {
+        World {
+            current_id: 0,
+            size_x: 8,
+            size_y: 4,
+            entities: HashMap::new(),
+            actions: vec![]
+        }
+    }
 }
 
 impl World {
     pub fn new() -> World {
         World {
             current_id: 0,
-            entities: HashMap::new(),
-            actions: vec![]
+            ..Default::default()
         }
     }
 
     pub fn get_entity(&self, entity_id: i32) -> Option<Entity> {
         self.entities.get(&entity_id).map(|e| e.clone())
+    }
+
+    pub fn on_coord(&self, coord: Coordinate) -> Option<&Entity> {
+        self.entities
+            .values()
+            .find(|entity| entity.coord.x == coord.x && entity.coord.y == coord.y)
     }
 
     pub fn update_entity(&mut self, entity: Entity) {
@@ -58,6 +75,8 @@ impl World {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use actions::movement;
+    use models::coordinate::Coordinate;
 
     #[test]
     fn register_entity() {
@@ -65,7 +84,7 @@ mod tests {
 
         let entity = world.register(Entity::new(0, Coordinate::new(0, 0)));
         assert_eq!(1, entity.id);
-        assert_eq!(entity.id, world.entities.get(&entity.id).unwrap().id);
+        assert_eq!(entity.id, world.get_entity(entity.id).unwrap().id);
 
         let entity2 = world.register(Entity::new(0, Coordinate::new(0, 0)));
         assert_eq!(2, entity2.id);

@@ -39,7 +39,6 @@ pub fn down(entity_id: i32) -> ActionData {
 
 pub fn process(world: &mut World, action: ActionData) {
     if let Some(entity) = world.get_entity(action.entity_id) {
-        println!("-------------- {} {} {}", entity.id, entity.coord.x, entity.coord.y);
         if let Some(dir) = action.direction {
             let coord = operate(entity.coord, dir);
             let new_entity = entity.with_coordinate(coord);
