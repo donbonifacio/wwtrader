@@ -4,7 +4,9 @@ use models::coordinate::Coordinate;
 #[derive(Clone, Debug, Copy)]
 pub enum EntityType {
     Player(i32),
-    Enemy
+    Enemy(char),
+    Obstacle(char),
+    Hole(char)
 
 }
 
@@ -30,7 +32,7 @@ impl Default for Entity {
 
 impl Entity {
     pub fn new(id: i32, coord: Coordinate) -> Entity {
-        Entity { id: id, coord: coord, entity_type: EntityType::Enemy }
+        Entity { id: id, coord: coord, entity_type: EntityType::Enemy('?') }
     }
 
     pub fn with_coordinate(&self, coord: Coordinate) -> Entity {
