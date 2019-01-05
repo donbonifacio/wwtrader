@@ -36,11 +36,12 @@ impl Entity {
     }
 
     pub fn with_coordinate(&self, coord: Coordinate) -> Entity {
-        Entity { id: self.id, coord: coord, entity_type: self.entity_type }
+        //Entity { id: self.id, coord: coord, entity_type: self.entity_type }
+        Entity { coord: coord, ..*self }
     }
 
-    pub fn with_id(self, new_id: i32) -> Entity {
-        Entity { id: new_id, coord: self.coord, entity_type: self.entity_type }
+    pub fn with_id(&self, new_id: i32) -> Entity {
+        Entity { id: new_id, ..*self }
     }
 }
 

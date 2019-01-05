@@ -1,0 +1,9 @@
+[package]
+name = "ggez-fe"
+version = "0.1.0"
+authors = ["Pedro Santos <donbonifacio@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+engine = { path = "../engine" }
+ggez = "0.4.4"
