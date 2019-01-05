@@ -1,6 +1,5 @@
-
-use models::entity::{Entity, EntityType};
 use models::coordinate::Coordinate;
+use models::entity::{Entity, EntityType};
 
 pub fn create_at(number: i8, coord: Coordinate) -> Entity {
     Entity {

@@ -1,4 +1,3 @@
-
 use models::coordinate::Coordinate;
 
 #[derive(Clone, Debug, Copy, PartialEq)]
@@ -6,18 +5,15 @@ pub enum EntityType {
     Player(i8),
     Enemy(char),
     Obstacle(char),
-    Hole(char)
-
+    Hole(char),
 }
 
 #[derive(Clone, Debug, Copy)]
 pub struct Entity {
     pub id: i32,
     pub coord: Coordinate,
-    pub entity_type: EntityType
-
-        // behaviour
-        // type
+    pub entity_type: EntityType, // behaviour
+                                 // type
 }
 
 impl Default for Entity {
@@ -25,23 +21,33 @@ impl Default for Entity {
         Entity {
             id: 0,
             coord: Coordinate::new(0, 0),
-            entity_type: EntityType::Player(1)
+            entity_type: EntityType::Player(1),
         }
     }
 }
 
 impl Entity {
     pub fn new(id: i32, coord: Coordinate) -> Entity {
-        Entity { id: id, coord: coord, entity_type: EntityType::Enemy('?') }
+        Entity {
+            id: id,
+            coord: coord,
+            entity_type: EntityType::Enemy('?'),
+        }
     }
 
     pub fn with_coordinate(&self, coord: Coordinate) -> Entity {
         //Entity { id: self.id, coord: coord, entity_type: self.entity_type }
-        Entity { coord: coord, ..*self }
+        Entity {
+            coord: coord,
+            ..*self
+        }
     }
 
     pub fn with_id(&self, new_id: i32) -> Entity {
-        Entity { id: new_id, ..*self }
+        Entity {
+            id: new_id,
+            ..*self
+        }
     }
 }
 

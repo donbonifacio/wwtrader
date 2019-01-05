@@ -1,9 +1,7 @@
-
-
 #[derive(Clone, Default, Debug, Copy)]
 pub struct Coordinate {
     pub x: i8,
-    pub y: i8
+    pub y: i8,
 }
 
 impl Coordinate {
@@ -40,8 +38,7 @@ mod tests {
     }
 
     fn is_adjacent_coords(x1: i8, y1: i8, x2: i8, y2: i8, expected: bool) {
-        let result = Coordinate::is_adjacent(Coordinate::new(x1, y1),
-                                             Coordinate::new(x2, y2));
+        let result = Coordinate::is_adjacent(Coordinate::new(x1, y1), Coordinate::new(x2, y2));
         assert!(result == expected)
     }
 }

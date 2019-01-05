@@ -1,8 +1,7 @@
-
-use models::actors::{player, bandid, mountain, water};
+use models::actors::{bandid, mountain, player, water};
+use models::coordinate::Coordinate;
 use models::entity::{Entity, EntityType};
 use models::world::World;
-use models::coordinate::Coordinate;
 
 pub fn print(world: World) -> String {
     let mut lines: Vec<String> = vec![];
@@ -23,9 +22,9 @@ fn coord_to_str(world: &World, x: usize, y: usize) -> String {
             EntityType::Player(n) => n.to_string(),
             EntityType::Enemy(c) => c.to_string(),
             EntityType::Obstacle(c) => c.to_string(),
-            EntityType::Hole(c) => c.to_string()
-        }
-        None => " ".to_string()
+            EntityType::Hole(c) => c.to_string(),
+        },
+        None => " ".to_string(),
     }
 }
 
@@ -34,34 +33,32 @@ pub fn load(raw: String) -> World {
 
     let mut world = World::create(lines[0].len(), lines.len());
 
-    lines.iter()
+    lines
+        .iter()
         .enumerate()
         .for_each(|(y, line)| load_line(&mut world, &y, &line));
 
     world
 }
 
-fn load_line(world: & mut World, y: &usize, raw: &str) {
-    raw.chars()
-        .enumerate()
-        .for_each(|(x, c)| {
-            let coord = Coordinate::new(x as i8, *y as i8);
-            let entity: Option<Entity> = match c {
-                '1' => Some(player::create_at(1, coord)),
-                '2' => Some(player::create_at(2, coord)),
-                'B' => Some(bandid::create_at(coord)),
-                '#' => Some(mountain::create_at(coord)),
-                '~' => Some(water::create_at(coord)),
-                ' ' => None,
-                _ => panic!("Don't know how to handle `{}`", c)
-            };
+fn load_line(world: &mut World, y: &usize, raw: &str) {
+    raw.chars().enumerate().for_each(|(x, c)| {
+        let coord = Coordinate::new(x as i8, *y as i8);
+        let entity: Option<Entity> = match c {
+            '1' => Some(player::create_at(1, coord)),
+            '2' => Some(player::create_at(2, coord)),
+            'B' => Some(bandid::create_at(coord)),
+            '#' => Some(mountain::create_at(coord)),
+            '~' => Some(water::create_at(coord)),
+            ' ' => None,
+            _ => panic!("Don't know how to handle `{}`", c),
+        };
 
-            if let Some(entity) = entity {
-                world.register(entity);
-            }
-        });
+        if let Some(entity) = entity {
+            world.register(entity);
+        }
+    });
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -73,10 +70,10 @@ mod tests {
         let world = World::new();
         let result = print(world);
 
-        assert_eq!(result, ["        ",
-                            "        ",
-                            "        ",
-                            "        "].join("\n"));
+        assert_eq!(
+            result,
+            ["        ", "        ", "        ", "        "].join("\n")
+        );
     }
 
     #[test]
@@ -92,16 +89,15 @@ mod tests {
 
         let result = print(world);
 
-        assert_eq!(result, ["        ",
-                            " 12 ##  ",
-                            "    ~~  ",
-                            "     B  "].join("\n"));
+        assert_eq!(
+            result,
+            ["        ", " 12 ##  ", "    ~~  ", "     B  "].join("\n")
+        );
     }
 
     #[test]
     fn load_empty_world() {
-        let world = load(["        ",
-                          "        "].join("\n"));
+        let world = load(["        ", "        "].join("\n"));
 
         assert_eq!(world.size_x, 8);
         assert_eq!(world.size_y, 2);
@@ -110,8 +106,7 @@ mod tests {
 
     #[test]
     fn load_world_with_actors() {
-        let world = load(["12      ",
-                          "     B#~"].join("\n"));
+        let world = load(["12      ", "     B#~"].join("\n"));
 
         assert_eq!(world.size_x, 8);
         assert_eq!(world.size_y, 2);

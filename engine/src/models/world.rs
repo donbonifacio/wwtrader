@@ -1,9 +1,8 @@
+use std::collections::HashMap;
 
-use std::collections::{HashMap};
-
-use models::entity::Entity;
-use models::coordinate::Coordinate;
 use actions::action::ActionData;
+use models::coordinate::Coordinate;
+use models::entity::Entity;
 
 #[derive(Clone)]
 pub struct World {
@@ -11,7 +10,7 @@ pub struct World {
     pub size_x: usize,
     pub size_y: usize,
     entities: HashMap<i32, Entity>,
-    actions: Vec<ActionData>
+    actions: Vec<ActionData>,
 }
 
 impl Default for World {
@@ -21,7 +20,7 @@ impl Default for World {
             size_x: 8,
             size_y: 4,
             entities: HashMap::new(),
-            actions: vec![]
+            actions: vec![],
         }
     }
 }

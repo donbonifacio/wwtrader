@@ -1,10 +1,9 @@
-
-use models::world::World;
 use actions::action::ActionData;
-use models::coordinate::Coordinate;
 use actions::movement;
 use actions::processor;
+use models::coordinate::Coordinate;
 use models::entity::Entity;
+use models::world::World;
 
 pub fn run(world: &mut World) {
     if !world.has_actions() {
@@ -39,7 +38,7 @@ mod tests {
         let move_right = movement::right(entity.id);
         world.register_action(move_right);
 
-        run(& mut world);
+        run(&mut world);
 
         assert!(!world.has_actions());
 
@@ -49,6 +48,5 @@ mod tests {
         let entity = entity_option.unwrap();
         assert_eq!(1, entity.coord.x);
         assert_eq!(1, entity.coord.y);
-
     }
 }

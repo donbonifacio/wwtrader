@@ -6,3 +6,6 @@ run: ## Runs the game.
 
 test: ## Runs the test suite.
 	cargo test
+
+lint: ## Checks lint rules.
+	cargo fmt --all -- --check

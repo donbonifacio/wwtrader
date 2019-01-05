@@ -1,15 +1,14 @@
-
+use actions::action::{ActionData, ActionType};
 use models::coordinate::Coordinate;
 use models::direction;
 use models::direction::Direction;
 use models::world::World;
-use actions::action::{ActionData, ActionType};
 
 pub fn left(entity_id: i32) -> ActionData {
     ActionData {
         entity_id: entity_id,
         action_type: ActionType::Move,
-        direction: Some(direction::LEFT)
+        direction: Some(direction::LEFT),
     }
 }
 
@@ -17,7 +16,7 @@ pub fn right(entity_id: i32) -> ActionData {
     ActionData {
         entity_id: entity_id,
         action_type: ActionType::Move,
-        direction: Some(direction::RIGHT)
+        direction: Some(direction::RIGHT),
     }
 }
 
@@ -25,7 +24,7 @@ pub fn up(entity_id: i32) -> ActionData {
     ActionData {
         entity_id: entity_id,
         action_type: ActionType::Move,
-        direction: Some(direction::UP)
+        direction: Some(direction::UP),
     }
 }
 
@@ -33,7 +32,7 @@ pub fn down(entity_id: i32) -> ActionData {
     ActionData {
         entity_id: entity_id,
         action_type: ActionType::Move,
-        direction: Some(direction::DOWN)
+        direction: Some(direction::DOWN),
     }
 }
 
@@ -48,19 +47,21 @@ pub fn process(world: &mut World, action: ActionData) {
 }
 
 pub fn operate(coord: Coordinate, direction: Direction) -> Coordinate {
-    Coordinate { x: coord.x + direction.dx, y: coord.y + direction.dy }
+    Coordinate {
+        x: coord.x + direction.dx,
+        y: coord.y + direction.dy,
+    }
 }
-
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use models::entity::Entity;
     use models::coordinate::Coordinate;
+    use models::entity::Entity;
 
     #[test]
     fn with_invalid_entity() {
-        let world:&mut World = &mut World::new();
+        let world: &mut World = &mut World::new();
         let left = left(1234);
         process(world, left);
     }
@@ -89,10 +90,8 @@ mod tests {
         expect_position(1, 1, up, 1, 0);
     }
 
-    fn expect_position(x: i8, y: i8,
-                       f: fn(i32) -> ActionData,
-                       ex: i8, ey: i8) {
-        let world:&mut World = &mut World::new();
+    fn expect_position(x: i8, y: i8, f: fn(i32) -> ActionData, ex: i8, ey: i8) {
+        let world: &mut World = &mut World::new();
         let entity = world.register(Entity::new(0, Coordinate::new(x, y)));
 
         let left = f(entity.id);
