@@ -1,9 +1,9 @@
 extern crate ggez;
 
 use ggez::conf;
-use ggez::event;
 use ggez::graphics;
 use ggez::graphics::{DrawMode, Point2};
+use ggez::event::{self, EventHandler, Keycode, Mod};
 use ggez::{Context, GameResult};
 use std::env;
 use std::path;
@@ -13,8 +13,8 @@ use engine::models::{Entity, EntityType};
 // First we make a structure to contain the game's state
 struct MainState {
     text: graphics::Text,
-    frames: usize,
     world: engine::models::World,
+    player_id: i32,
 }
 
 impl MainState {
@@ -37,9 +37,10 @@ impl MainState {
 
         let s = MainState {
             text,
-            frames: 0,
             world: engine::serializers::basic::load(world_data),
+            player_id: 1,
         };
+
         Ok(s)
     }
 }
@@ -80,6 +81,7 @@ impl MainState {
 // that you can override if you wish, but the defaults are fine.
 impl event::EventHandler for MainState {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
+        engine::game::runner::run(&mut self.world);
         Ok(())
     }
 
@@ -112,12 +114,29 @@ impl event::EventHandler for MainState {
 
         graphics::present(ctx);
 
-        self.frames += 1;
-        if (self.frames % 100) == 0 {
-            println!("FPS: {}", ggez::timer::get_fps(ctx));
-        }
-
         Ok(())
+    }
+
+    fn key_up_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+        match keycode {
+            Keycode::Up => {
+                let action = engine::actions::movement::up(self.player_id);
+                self.world.register_action(action);
+            }
+            Keycode::Left => {
+                let action = engine::actions::movement::left(self.player_id);
+                self.world.register_action(action);
+            }
+            Keycode::Right => {
+                let action = engine::actions::movement::right(self.player_id);
+                self.world.register_action(action);
+            }
+            Keycode::Down => {
+                let action = engine::actions::movement::down(self.player_id);
+                self.world.register_action(action);
+            }
+            _ => (),
+        }
     }
 }
 
