@@ -7,4 +7,5 @@ pub mod world;
 pub use self::coordinate::Coordinate;
 pub use self::direction::Direction;
 pub use self::entity::Entity;
+pub use self::entity::EntityType;
 pub use self::world::World;

@@ -3,14 +3,18 @@ extern crate ggez;
 use ggez::conf;
 use ggez::event;
 use ggez::graphics;
+use ggez::graphics::{DrawMode, Point2};
 use ggez::{Context, GameResult};
 use std::env;
 use std::path;
+
+use engine::models::{Entity, EntityType};
 
 // First we make a structure to contain the game's state
 struct MainState {
     text: graphics::Text,
     frames: usize,
+    world: engine::models::World,
 }
 
 impl MainState {
@@ -18,11 +22,55 @@ impl MainState {
         // The ttf file will be in your resources directory. Later, we
         // will mount that directory so we can omit it in the path here.
         let font = graphics::Font::new(ctx, "/DejaVuSerif.ttf", 48)?;
-        let text = graphics::Text::new(ctx, "Hello world!", &font)?;
+        let text = graphics::Text::new(ctx, "Wild Wild Trader", &font)?;
 
-        let s = MainState { text, frames: 0 };
+        let world_data = ["1     B        ",
+                          "               ",
+                          "               ",
+                          "      ~~~~##   ",
+                          "       ~~~~~#  ",
+                          "               ",
+                          "   #           ",
+                          "  ###          ",
+                          "   #           ",
+                          "               "].join("\n");
+
+        let s = MainState {
+            text,
+            frames: 0,
+            world: engine::serializers::basic::load(world_data),
+        };
         Ok(s)
     }
+}
+
+const START_X: f32 = 10.0;
+const START_Y: f32 = 90.0;
+const ENTITY_SIZE: f32 = 50.0;
+
+impl MainState {
+    fn draw_entity(&mut self, ctx: &mut Context, entity: &Entity) -> GameResult<()> {
+        let color = match entity.entity_type {
+            EntityType::Player(_) => graphics::Color { r: 6.0, g: 6.0, b: 1.0,a: 1.0,},
+            EntityType::Enemy(_) => graphics::Color { r: 1.0, g: 0.0, b: 0.0,a: 1.0,},
+            EntityType::Obstacle(_) => graphics::Color { r: 0.5, g: 0.5, b: 0.5, a: 1.0,},
+            EntityType::Hole(_) => graphics::Color { r: 0.2, g: 0.2, b: 0.8, a: 1.0,},
+        };
+
+        let x = START_X + (entity.coord.x as f32) * ENTITY_SIZE + ENTITY_SIZE / 2.0;
+        let y = START_Y + (entity.coord.y as f32) * ENTITY_SIZE + ENTITY_SIZE / 2.0;
+
+        let mesh = graphics::MeshBuilder::new()
+            //.rectangle(graphics::DrawMode::Fill, graphics::Point2::new(100.0, 100.0), 100.0, 100.0, graphics::WHITE)
+            .circle(DrawMode::Fill, Point2::new(x, y), ENTITY_SIZE / 2.0, 1.0)
+            .build(ctx)?;
+
+        graphics::set_color(ctx, color)?;
+        graphics::draw(ctx, &mesh, graphics::Point2::new(0.0, 0.0), 0.0)?;
+
+        Ok(())
+    }
+
 }
 
 // Then we implement the `ggez:event::EventHandler` trait on it, which
@@ -37,10 +85,59 @@ impl event::EventHandler for MainState {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx);
+        graphics::set_color(ctx, graphics::WHITE)?;
 
         // Drawables are drawn from their top-left corner.
         let dest_point = graphics::Point2::new(10.0, 10.0);
         graphics::draw(ctx, &self.text, dest_point, 0.0)?;
+
+        self.world.get_entity(1).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(2).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(3).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(4).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(5).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(6).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(7).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(8).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(9).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(10).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(11).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(12).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(13).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(14).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(15).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(16).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(17).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(18).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(19).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(20).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(21).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(22).map(|entity| { self.draw_entity(ctx, &entity)});
+        self.world.get_entity(23).map(|entity| { self.draw_entity(ctx, &entity)});
+
+        /*
+        for y in 0..self.world.size_y {
+            for x in 0..self.world.size_x {
+                let entity = self.world.on_coord(engine::models::Coordinate::new(x as i8, y as i8));
+                self.draw_entity(ctx, &entity.unwrap());
+            }
+        }
+        */
+        graphics::set_color(ctx, graphics::WHITE)?;
+        let board = graphics::MeshBuilder::new()
+            .line(
+                &[
+                    Point2::new(START_X, START_Y),
+                    Point2::new(START_X + (self.world.size_x as f32) * ENTITY_SIZE, START_Y),
+                    Point2::new(START_X + (self.world.size_x as f32) * ENTITY_SIZE, START_Y + (self.world.size_y as f32) * ENTITY_SIZE),
+                    Point2::new(START_X, START_Y + (self.world.size_y as f32) * ENTITY_SIZE),
+                    Point2::new(START_X, START_Y),
+                ],
+                4.0,)
+            .build(ctx)?;
+
+        graphics::draw(ctx, &board, graphics::Point2::new(0.0, 0.0), 0.0)?;
+
         graphics::present(ctx);
 
         self.frames += 1;
