@@ -9,7 +9,7 @@ pub struct World {
     current_id: i32,
     pub size_x: usize,
     pub size_y: usize,
-    entities: HashMap<i32, Entity>,
+    pub entities: HashMap<i32, Entity>,
     actions: Vec<ActionData>,
 }
 

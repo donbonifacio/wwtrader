@@ -24,15 +24,15 @@ impl MainState {
         let font = graphics::Font::new(ctx, "/DejaVuSerif.ttf", 48)?;
         let text = graphics::Text::new(ctx, "Wild Wild Trader", &font)?;
 
-        let world_data = ["1     B        ",
-                          "               ",
+        let world_data = ["               ",
+                          " 1             ",
                           "               ",
                           "      ~~~~##   ",
                           "       ~~~~~#  ",
                           "               ",
                           "   #           ",
                           "  ###          ",
-                          "   #           ",
+                          "   #     B     ",
                           "               "].join("\n");
 
         let s = MainState {
@@ -49,7 +49,7 @@ const START_Y: f32 = 90.0;
 const ENTITY_SIZE: f32 = 50.0;
 
 impl MainState {
-    fn draw_entity(&mut self, ctx: &mut Context, entity: &Entity) -> GameResult<()> {
+    fn draw_entity(&self, ctx: &mut Context, entity: &Entity) -> GameResult<()> {
         let color = match entity.entity_type {
             EntityType::Player(_) => graphics::Color { r: 6.0, g: 6.0, b: 1.0,a: 1.0,},
             EntityType::Enemy(_) => graphics::Color { r: 1.0, g: 0.0, b: 0.0,a: 1.0,},
@@ -91,38 +91,10 @@ impl event::EventHandler for MainState {
         let dest_point = graphics::Point2::new(10.0, 10.0);
         graphics::draw(ctx, &self.text, dest_point, 0.0)?;
 
-        self.world.get_entity(1).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(2).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(3).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(4).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(5).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(6).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(7).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(8).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(9).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(10).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(11).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(12).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(13).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(14).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(15).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(16).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(17).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(18).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(19).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(20).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(21).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(22).map(|entity| { self.draw_entity(ctx, &entity)});
-        self.world.get_entity(23).map(|entity| { self.draw_entity(ctx, &entity)});
-
-        /*
-        for y in 0..self.world.size_y {
-            for x in 0..self.world.size_x {
-                let entity = self.world.on_coord(engine::models::Coordinate::new(x as i8, y as i8));
-                self.draw_entity(ctx, &entity.unwrap());
-            }
+        for (_, entity) in &self.world.entities {
+            self.draw_entity(ctx, &entity)?;
         }
-        */
+
         graphics::set_color(ctx, graphics::WHITE)?;
         let board = graphics::MeshBuilder::new()
             .line(
