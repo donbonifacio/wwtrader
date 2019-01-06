@@ -1,9 +1,9 @@
 extern crate ggez;
 
 use ggez::conf;
+use ggez::event::{self, Keycode, Mod};
 use ggez::graphics;
 use ggez::graphics::{DrawMode, Point2};
-use ggez::event::{self, EventHandler, Keycode, Mod};
 use ggez::{Context, GameResult};
 use std::env;
 use std::path;
@@ -18,30 +18,31 @@ struct MainState {
 }
 
 impl MainState {
-    fn new(ctx: &mut Context) -> GameResult<MainState> {
+    fn new(ctx: &mut Context) -> MainState {
         // The ttf file will be in your resources directory. Later, we
         // will mount that directory so we can omit it in the path here.
-        let font = graphics::Font::new(ctx, "/DejaVuSerif.ttf", 48)?;
-        let text = graphics::Text::new(ctx, "Wild Wild Trader", &font)?;
+        let font = graphics::Font::new(ctx, "/DejaVuSerif.ttf", 48).unwrap();
+        let text = graphics::Text::new(ctx, "Wild Wild Trader", &font).unwrap();
 
-        let world_data = ["               ",
-                          " 1             ",
-                          "               ",
-                          "      ~~~~##   ",
-                          "       ~~~~~#  ",
-                          "               ",
-                          "   #           ",
-                          "  ###          ",
-                          "   #     B     ",
-                          "               "].join("\n");
+        let world_data = [
+            "               ",
+            " 1             ",
+            "               ",
+            "      ~~~~##   ",
+            "       ~~~~~#  ",
+            "               ",
+            "   #           ",
+            "  ###          ",
+            "   #     B     ",
+            "               ",
+        ]
+        .join("\n");
 
-        let s = MainState {
+        MainState {
             text,
-            world: engine::serializers::basic::load(world_data),
+            world: engine::serializers::basic::load(&world_data),
             player_id: 1,
-        };
-
-        Ok(s)
+        }
     }
 }
 
@@ -52,14 +53,34 @@ const ENTITY_SIZE: f32 = 50.0;
 impl MainState {
     fn draw_entity(&self, ctx: &mut Context, entity: &Entity) -> GameResult<()> {
         let color = match entity.entity_type {
-            EntityType::Player(_) => graphics::Color { r: 6.0, g: 6.0, b: 1.0,a: 1.0,},
-            EntityType::Enemy(_) => graphics::Color { r: 1.0, g: 0.0, b: 0.0,a: 1.0,},
-            EntityType::Obstacle(_) => graphics::Color { r: 0.5, g: 0.5, b: 0.5, a: 1.0,},
-            EntityType::Hole(_) => graphics::Color { r: 0.2, g: 0.2, b: 0.8, a: 1.0,},
+            EntityType::Player(_) => graphics::Color {
+                r: 6.0,
+                g: 6.0,
+                b: 1.0,
+                a: 1.0,
+            },
+            EntityType::Enemy(_) => graphics::Color {
+                r: 1.0,
+                g: 0.0,
+                b: 0.0,
+                a: 1.0,
+            },
+            EntityType::Obstacle(_) => graphics::Color {
+                r: 0.5,
+                g: 0.5,
+                b: 0.5,
+                a: 1.0,
+            },
+            EntityType::Hole(_) => graphics::Color {
+                r: 0.2,
+                g: 0.2,
+                b: 0.8,
+                a: 1.0,
+            },
         };
 
-        let x = START_X + (entity.coord.x as f32) * ENTITY_SIZE + ENTITY_SIZE / 2.0;
-        let y = START_Y + (entity.coord.y as f32) * ENTITY_SIZE + ENTITY_SIZE / 2.0;
+        let x = START_X + f32::from(entity.coord.x) * ENTITY_SIZE + ENTITY_SIZE / 2.0;
+        let y = START_Y + f32::from(entity.coord.y) * ENTITY_SIZE + ENTITY_SIZE / 2.0;
 
         let mesh = graphics::MeshBuilder::new()
             //.rectangle(graphics::DrawMode::Fill, graphics::Point2::new(100.0, 100.0), 100.0, 100.0, graphics::WHITE)
@@ -71,7 +92,6 @@ impl MainState {
 
         Ok(())
     }
-
 }
 
 // Then we implement the `ggez:event::EventHandler` trait on it, which
@@ -93,7 +113,7 @@ impl event::EventHandler for MainState {
         let dest_point = graphics::Point2::new(10.0, 10.0);
         graphics::draw(ctx, &self.text, dest_point, 0.0)?;
 
-        for (_, entity) in &self.world.entities {
+        for entity in self.world.entities.values() {
             self.draw_entity(ctx, &entity)?;
         }
 
@@ -103,11 +123,15 @@ impl event::EventHandler for MainState {
                 &[
                     Point2::new(START_X, START_Y),
                     Point2::new(START_X + (self.world.size_x as f32) * ENTITY_SIZE, START_Y),
-                    Point2::new(START_X + (self.world.size_x as f32) * ENTITY_SIZE, START_Y + (self.world.size_y as f32) * ENTITY_SIZE),
+                    Point2::new(
+                        START_X + (self.world.size_x as f32) * ENTITY_SIZE,
+                        START_Y + (self.world.size_y as f32) * ENTITY_SIZE,
+                    ),
                     Point2::new(START_X, START_Y + (self.world.size_y as f32) * ENTITY_SIZE),
                     Point2::new(START_X, START_Y),
                 ],
-                4.0,)
+                4.0,
+            )
             .build(ctx)?;
 
         graphics::draw(ctx, &board, graphics::Point2::new(0.0, 0.0), 0.0)?;
@@ -160,7 +184,7 @@ pub fn main() {
         ctx.filesystem.mount(&path, true);
     }
 
-    let state = &mut MainState::new(ctx).unwrap();
+    let state = &mut MainState::new(ctx);
     if let Err(e) = event::run(ctx, state) {
         println!("Error encountered: {}", e);
     } else {

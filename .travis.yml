@@ -16,7 +16,6 @@ matrix:
 os:
     - linux
     - osx
-    - windows
 
 addons:
   apt:
@@ -56,7 +55,7 @@ script:
 
 jobs:
   include:
-  - name: fmt
+  - name: lint
     rust: stable
     install:
       - rustup component add rustfmt
@@ -65,4 +64,3 @@ jobs:
       - cargo clippy -V
     script:
       - make lint
-      - cargo clippy --verbose -- -D warnings
