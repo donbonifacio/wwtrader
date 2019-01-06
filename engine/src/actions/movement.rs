@@ -6,7 +6,7 @@ use models::world::World;
 
 pub fn left(entity_id: i32) -> ActionData {
     ActionData {
-        entity_id: entity_id,
+        entity_id,
         action_type: ActionType::Move,
         direction: Some(direction::LEFT),
     }
@@ -14,7 +14,7 @@ pub fn left(entity_id: i32) -> ActionData {
 
 pub fn right(entity_id: i32) -> ActionData {
     ActionData {
-        entity_id: entity_id,
+        entity_id,
         action_type: ActionType::Move,
         direction: Some(direction::RIGHT),
     }
@@ -22,7 +22,7 @@ pub fn right(entity_id: i32) -> ActionData {
 
 pub fn up(entity_id: i32) -> ActionData {
     ActionData {
-        entity_id: entity_id,
+        entity_id,
         action_type: ActionType::Move,
         direction: Some(direction::UP),
     }
@@ -30,7 +30,7 @@ pub fn up(entity_id: i32) -> ActionData {
 
 pub fn down(entity_id: i32) -> ActionData {
     ActionData {
-        entity_id: entity_id,
+        entity_id,
         action_type: ActionType::Move,
         direction: Some(direction::DOWN),
     }

@@ -42,7 +42,7 @@ impl World {
     }
 
     pub fn get_entity(&self, entity_id: i32) -> Option<Entity> {
-        self.entities.get(&entity_id).map(|e| e.clone())
+        self.entities.get(&entity_id).cloned()
     }
 
     pub fn on_coord(&self, coord: Coordinate) -> Option<&Entity> {
@@ -67,7 +67,7 @@ impl World {
     }
 
     pub fn has_actions(&self) -> bool {
-        self.actions.len() > 0
+        !self.actions.is_empty()
     }
 
     pub fn clear_actions(&mut self) {
@@ -95,7 +95,7 @@ mod tests {
 
         let entity2 = world.register(Entity::new(0, Coordinate::new(0, 0)));
         assert_eq!(2, entity2.id);
-        assert_eq!(entity2.id, world.entities.get(&entity2.id).unwrap().id);
+        assert_eq!(entity2.id, world.entities[&entity2.id].id);
     }
 
     #[test]

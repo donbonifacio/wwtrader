@@ -7,7 +7,7 @@ pub struct Coordinate {
 impl Coordinate {
     /// Returns a new `Coordinate`
     pub fn new(x: i8, y: i8) -> Coordinate {
-        Coordinate { x: x, y: y }
+        Coordinate { x, y }
     }
 
     pub fn is_adjacent(self, other: Coordinate) -> bool {

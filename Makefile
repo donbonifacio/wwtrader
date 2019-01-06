@@ -9,3 +9,5 @@ test: ## Runs the test suite.
 
 lint: ## Checks lint rules.
 	cargo fmt --all -- --check
+	cargo clippy --verbose --all-targets --all-features -- -D warnings
+

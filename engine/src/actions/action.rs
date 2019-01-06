@@ -1,5 +1,4 @@
 use models::direction::Direction;
-use models::world::World;
 
 #[derive(Clone, Debug, Copy)]
 pub enum ActionType {

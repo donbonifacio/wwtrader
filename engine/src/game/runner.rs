@@ -1,8 +1,5 @@
 use actions::action::ActionData;
-use actions::movement;
 use actions::processor;
-use models::coordinate::Coordinate;
-use models::entity::Entity;
 use models::world::World;
 
 pub fn run(world: &mut World) {
@@ -18,14 +15,16 @@ fn run_actions(world: &mut World) {
     processor::process_actions(world, &actions)
 }
 
-fn get_actions(world: &mut World) -> Vec<ActionData> {
-    // TODO: remove clone
-    world.get_actions().clone()
+fn get_actions(world: &World) -> Vec<ActionData> {
+    world.get_actions().to_vec()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use actions::movement;
+    use models::coordinate::Coordinate;
+    use models::entity::Entity;
 
     #[test]
     fn run_actions() {

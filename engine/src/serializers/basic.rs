@@ -3,12 +3,12 @@ use models::coordinate::Coordinate;
 use models::entity::{Entity, EntityType};
 use models::world::World;
 
-pub fn print(world: World) -> String {
+pub fn print(world: &World) -> String {
     let mut lines: Vec<String> = vec![];
     for y in 0..world.size_y {
-        let mut line: Vec<String> = vec![String::new(); world.size_x];
+        let mut line: Vec<String> = vec![];
         for x in 0..world.size_x {
-            line[x] = coord_to_str(&world, x, y);
+            line.push(coord_to_str(&world, x, y));
         }
         lines.push(line.join(""));
     }
@@ -28,22 +28,22 @@ fn coord_to_str(world: &World, x: usize, y: usize) -> String {
     }
 }
 
-pub fn load(raw: String) -> World {
-    let lines: Vec<&str> = raw.split("\n").collect();
+pub fn load(raw: &str) -> World {
+    let lines: Vec<&str> = raw.split('\n').collect();
 
     let mut world = World::create(lines[0].len(), lines.len());
 
     lines
         .iter()
         .enumerate()
-        .for_each(|(y, line)| load_line(&mut world, &y, &line));
+        .for_each(|(y, line)| load_line(&mut world, y, &line));
 
     world
 }
 
-fn load_line(world: &mut World, y: &usize, raw: &str) {
+fn load_line(world: &mut World, y: usize, raw: &str) {
     raw.chars().enumerate().for_each(|(x, c)| {
-        let coord = Coordinate::new(x as i8, *y as i8);
+        let coord = Coordinate::new(x as i8, y as i8);
         let entity: Option<Entity> = match c {
             '1' => Some(player::create_at(1, coord)),
             '2' => Some(player::create_at(2, coord)),
@@ -68,7 +68,7 @@ mod tests {
     #[test]
     fn print_empty_world() {
         let world = World::new();
-        let result = print(world);
+        let result = print(&world);
 
         assert_eq!(
             result,
@@ -87,7 +87,7 @@ mod tests {
         world.register(water::create_at(Coordinate::new(5, 2)));
         world.register(bandid::create_at(Coordinate::new(5, 3)));
 
-        let result = print(world);
+        let result = print(&world);
 
         assert_eq!(
             result,
@@ -97,7 +97,7 @@ mod tests {
 
     #[test]
     fn load_empty_world() {
-        let world = load(["        ", "        "].join("\n"));
+        let world = load(&["        ", "        "].join("\n"));
 
         assert_eq!(world.size_x, 8);
         assert_eq!(world.size_y, 2);
@@ -106,7 +106,7 @@ mod tests {
 
     #[test]
     fn load_world_with_actors() {
-        let world = load(["12      ", "     B#~"].join("\n"));
+        let world = load(&["12      ", "     B#~"].join("\n"));
 
         assert_eq!(world.size_x, 8);
         assert_eq!(world.size_y, 2);
@@ -114,32 +114,32 @@ mod tests {
 
         let player: Option<&Entity> = world.on_coord(Coordinate::new(0, 0));
         assert!(player.is_some());
-        player.map(|entity| {
+        if let Some(entity) = player {
             assert_eq!(entity.entity_type, EntityType::Player(1));
-        });
+        }
 
         let player2: Option<&Entity> = world.on_coord(Coordinate::new(1, 0));
         assert!(player2.is_some());
-        player2.map(|entity| {
+        if let Some(entity) = player2 {
             assert_eq!(entity.entity_type, EntityType::Player(2));
-        });
+        }
 
         let bandid: Option<&Entity> = world.on_coord(Coordinate::new(5, 1));
         assert!(bandid.is_some());
-        bandid.map(|entity| {
+        if let Some(entity) = bandid {
             assert_eq!(entity.entity_type, EntityType::Enemy('B'));
-        });
+        }
 
         let mountain: Option<&Entity> = world.on_coord(Coordinate::new(6, 1));
         assert!(mountain.is_some());
-        mountain.map(|entity| {
+        if let Some(entity) = mountain {
             assert_eq!(entity.entity_type, EntityType::Obstacle('#'));
-        });
+        }
 
         let water: Option<&Entity> = world.on_coord(Coordinate::new(7, 1));
         assert!(water.is_some());
-        water.map(|entity| {
+        if let Some(entity) = water {
             assert_eq!(entity.entity_type, EntityType::Hole('~'));
-        });
+        }
     }
 }
