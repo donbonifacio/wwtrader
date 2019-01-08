@@ -14,7 +14,7 @@ use engine::models::{Entity, EntityType};
 struct MainState {
     text: graphics::Text,
     world: engine::models::World,
-    player_id: i32,
+    first_player_id: i32,
 }
 
 impl MainState {
@@ -26,7 +26,7 @@ impl MainState {
 
         let world_data = [
             "               ",
-            " 1             ",
+            " 1           2 ",
             "               ",
             "      ~~~~##   ",
             "       ~~~~~#  ",
@@ -41,7 +41,7 @@ impl MainState {
         MainState {
             text,
             world: engine::serializers::basic::load(&world_data),
-            player_id: 1,
+            first_player_id: 1,
         }
     }
 }
@@ -144,19 +144,19 @@ impl event::EventHandler for MainState {
     fn key_up_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Up => {
-                let action = engine::actions::movement::up(self.player_id);
+                let action = engine::actions::movement::up(self.first_player_id);
                 self.world.register_action(action);
             }
             Keycode::Left => {
-                let action = engine::actions::movement::left(self.player_id);
+                let action = engine::actions::movement::left(self.first_player_id);
                 self.world.register_action(action);
             }
             Keycode::Right => {
-                let action = engine::actions::movement::right(self.player_id);
+                let action = engine::actions::movement::right(self.first_player_id);
                 self.world.register_action(action);
             }
             Keycode::Down => {
-                let action = engine::actions::movement::down(self.player_id);
+                let action = engine::actions::movement::down(self.first_player_id);
                 self.world.register_action(action);
             }
             _ => (),
