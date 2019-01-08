@@ -15,6 +15,7 @@ struct MainState {
     text: graphics::Text,
     world: engine::models::World,
     first_player_id: i32,
+    second_player_id: i32,
 }
 
 impl MainState {
@@ -42,6 +43,7 @@ impl MainState {
             text,
             world: engine::serializers::basic::load(&world_data),
             first_player_id: 1,
+            second_player_id: 2,
         }
     }
 }
@@ -53,6 +55,18 @@ const ENTITY_SIZE: f32 = 50.0;
 impl MainState {
     fn draw_entity(&self, ctx: &mut Context, entity: &Entity) -> GameResult<()> {
         let color = match entity.entity_type {
+            EntityType::Player(1) => graphics::Color {
+                r: 6.0,
+                g: 6.0,
+                b: 1.0,
+                a: 1.0,
+            },
+            EntityType::Player(2) => graphics::Color {
+                r: 0.0,
+                g: 6.0,
+                b: 0.0,
+                a: 1.0,
+            },
             EntityType::Player(_) => graphics::Color {
                 r: 6.0,
                 g: 6.0,
@@ -157,6 +171,22 @@ impl event::EventHandler for MainState {
             }
             Keycode::Down => {
                 let action = engine::actions::movement::down(self.first_player_id);
+                self.world.register_action(action);
+            }
+            Keycode::W => {
+                let action = engine::actions::movement::up(self.second_player_id);
+                self.world.register_action(action);
+            }
+            Keycode::A => {
+                let action = engine::actions::movement::left(self.second_player_id);
+                self.world.register_action(action);
+            }
+            Keycode::D => {
+                let action = engine::actions::movement::right(self.second_player_id);
+                self.world.register_action(action);
+            }
+            Keycode::S => {
+                let action = engine::actions::movement::down(self.second_player_id);
                 self.world.register_action(action);
             }
             _ => (),
