@@ -1,10 +1,9 @@
 use actions::action::{ActionData, ActionType};
 use actions::movement;
+use engine_result::EngineResult;
 use models::world::World;
 
-type Result<T> = std::result::Result<T, movement::MovementError>;
-
-pub fn process_actions(world: &mut World, actions: &[ActionData]) -> Result<()> {
+pub fn process_actions(world: &mut World, actions: &[ActionData]) -> EngineResult<()> {
     for action in actions {
         process_action(world, *action)?;
     }
@@ -12,7 +11,7 @@ pub fn process_actions(world: &mut World, actions: &[ActionData]) -> Result<()> 
     Ok(())
 }
 
-fn process_action(world: &mut World, action: ActionData) -> Result<()> {
+fn process_action(world: &mut World, action: ActionData) -> EngineResult<()> {
     match action.action_type {
         ActionType::Move => movement::process(world, action),
     }

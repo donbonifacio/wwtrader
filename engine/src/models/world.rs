@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
 use actions::action::ActionData;
+use engine_result::EngineResult;
+use error::EngineError;
 use models::coordinate::Coordinate;
 use models::entity::Entity;
 
@@ -41,8 +43,12 @@ impl World {
         }
     }
 
-    pub fn get_entity(&self, entity_id: i32) -> Option<Entity> {
-        self.entities.get(&entity_id).cloned()
+    pub fn get_entity(&self, entity_id: i32) -> EngineResult<Entity> {
+        if let Some(entity) = self.entities.get(&entity_id).cloned() {
+            return Ok(entity);
+        }
+
+        Err(EngineError::InvalidEntityId(entity_id))
     }
 
     pub fn on_coord(&self, coord: Coordinate) -> Option<&Entity> {

@@ -1,11 +1,9 @@
 use actions::action::ActionData;
-use actions::movement;
 use actions::processor;
+use engine_result::EngineResult;
 use models::world::World;
 
-type Result<T> = std::result::Result<T, movement::MovementError>;
-
-pub fn run(world: &mut World) -> Result<()> {
+pub fn run(world: &mut World) -> EngineResult<()> {
     if !world.has_actions() {
         return Ok(());
     }
@@ -17,7 +15,7 @@ pub fn run(world: &mut World) -> Result<()> {
     result
 }
 
-fn run_actions(world: &mut World) -> Result<()> {
+fn run_actions(world: &mut World) -> EngineResult<()> {
     let actions = get_actions(world);
     processor::process_actions(world, &actions)
 }
@@ -48,10 +46,10 @@ mod tests {
 
         assert!(!world.has_actions());
 
-        let entity_option = world.get_entity(entity.id);
-        assert!(entity_option.is_some());
+        let entity_result = world.get_entity(entity.id);
+        assert!(entity_result.is_ok());
 
-        let entity = entity_option.unwrap();
+        let entity = entity_result.unwrap();
         assert!(entity.coord.is_at_x(1.0));
         assert!(entity.coord.is_at_y(1.0));
     }

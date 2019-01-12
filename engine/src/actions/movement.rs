@@ -1,19 +1,9 @@
 use actions::action::{ActionData, ActionType};
+use engine_result::EngineResult;
 use models::coordinate::Coordinate;
 use models::direction;
 use models::direction::Direction;
 use models::world::World;
-use std::fmt;
-
-pub struct MovementError {}
-
-impl fmt::Display for MovementError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Movement error")
-    }
-}
-
-type Result<T> = std::result::Result<T, MovementError>;
 
 pub fn left(entity_id: i32) -> ActionData {
     ActionData {
@@ -47,19 +37,16 @@ pub fn down(entity_id: i32) -> ActionData {
     }
 }
 
-pub fn process(world: &mut World, action: ActionData) -> Result<()> {
-    if let Some(entity) = world.get_entity(action.entity_id) {
-        if let Some(dir) = action.direction {
-            let coord = operate(entity.coord, dir);
-            let new_entity = entity.with_coordinate(coord);
-            world.update_entity(new_entity);
+pub fn process(world: &mut World, action: ActionData) -> EngineResult<()> {
+    let entity = world.get_entity(action.entity_id)?;
 
-            return Ok(());
-        }
+    if let Some(dir) = action.direction {
+        let coord = operate(entity.coord, dir);
+        let new_entity = entity.with_coordinate(coord);
+        world.update_entity(new_entity);
     }
 
-    // TODO: Proper error
-    Err(MovementError {})
+    Ok(())
 }
 
 pub fn operate(coord: Coordinate, direction: Direction) -> Coordinate {
@@ -72,6 +59,7 @@ pub fn operate(coord: Coordinate, direction: Direction) -> Coordinate {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use error::EngineError;
     use models::coordinate::Coordinate;
     use models::entity::Entity;
 
@@ -79,7 +67,8 @@ mod tests {
     fn with_invalid_entity() {
         let world: &mut World = &mut World::new();
         let left = left(1234);
-        assert!(process(world, left).is_err());
+        let result = process(world, left);
+        assert_eq!(result.err(), Some(EngineError::InvalidEntityId(1234)));
     }
 
     #[test]
