@@ -19,7 +19,7 @@ impl Default for Entity {
     fn default() -> Entity {
         Entity {
             id: 0,
-            coord: Coordinate::new(0, 0),
+            coord: Coordinate::new(0.0, 0.0),
             entity_type: EntityType::Player(1),
         }
     }
@@ -52,9 +52,9 @@ mod tests {
 
     #[test]
     fn create_new() {
-        let entity = Entity::new(1, Coordinate::new(2, 3));
+        let entity = Entity::new(1, Coordinate::new(2.0, 3.0));
         assert_eq!(1, entity.id);
-        assert_eq!(2, entity.coord.x);
-        assert_eq!(3, entity.coord.y);
+        assert!(entity.coord.is_at_x(2.0));
+        assert!(entity.coord.is_at_y(3.0));
     }
 }

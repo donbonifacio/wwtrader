@@ -8,7 +8,7 @@ pub fn print(world: &World) -> String {
     for y in 0..world.size_y {
         let mut line: Vec<String> = vec![];
         for x in 0..world.size_x {
-            line.push(coord_to_str(&world, x, y));
+            line.push(coord_to_str(&world, x as f32, y as f32));
         }
         lines.push(line.join(""));
     }
@@ -16,8 +16,8 @@ pub fn print(world: &World) -> String {
     lines.join("\n")
 }
 
-fn coord_to_str(world: &World, x: usize, y: usize) -> String {
-    match world.on_coord(Coordinate::new(x as i8, y as i8)) {
+fn coord_to_str(world: &World, x: f32, y: f32) -> String {
+    match world.on_coord(Coordinate::new(x, y)) {
         Some(entity) => match entity.entity_type {
             EntityType::Player(n) => n.to_string(),
             EntityType::Enemy(c) => c.to_string(),
@@ -36,14 +36,14 @@ pub fn load(raw: &str) -> World {
     lines
         .iter()
         .enumerate()
-        .for_each(|(y, line)| load_line(&mut world, y, &line));
+        .for_each(|(y, line)| load_line(&mut world, y as f32, &line));
 
     world
 }
 
-fn load_line(world: &mut World, y: usize, raw: &str) {
+fn load_line(world: &mut World, y: f32, raw: &str) {
     raw.chars().enumerate().for_each(|(x, c)| {
-        let coord = Coordinate::new(x as i8, y as i8);
+        let coord = Coordinate::new(x as f32, y);
         let entity: Option<Entity> = match c {
             '1' => Some(player::create_at(1, coord)),
             '2' => Some(player::create_at(2, coord)),
@@ -79,13 +79,13 @@ mod tests {
     #[test]
     fn print_world_with_actors() {
         let mut world = World::new();
-        world.register(player::create_at(1, Coordinate::new(1, 1)));
-        world.register(player::create_at(2, Coordinate::new(2, 1)));
-        world.register(mountain::create_at(Coordinate::new(4, 1)));
-        world.register(mountain::create_at(Coordinate::new(5, 1)));
-        world.register(water::create_at(Coordinate::new(4, 2)));
-        world.register(water::create_at(Coordinate::new(5, 2)));
-        world.register(bandid::create_at(Coordinate::new(5, 3)));
+        world.register(player::create_at(1, Coordinate::new(1.0, 1.0)));
+        world.register(player::create_at(2, Coordinate::new(2.0, 1.0)));
+        world.register(mountain::create_at(Coordinate::new(4.0, 1.0)));
+        world.register(mountain::create_at(Coordinate::new(5.0, 1.0)));
+        world.register(water::create_at(Coordinate::new(4.0, 2.0)));
+        world.register(water::create_at(Coordinate::new(5.0, 2.0)));
+        world.register(bandid::create_at(Coordinate::new(5.0, 3.0)));
 
         let result = print(&world);
 
@@ -112,31 +112,31 @@ mod tests {
         assert_eq!(world.size_y, 2);
         assert_eq!(world.has_actions(), false);
 
-        let player: Option<&Entity> = world.on_coord(Coordinate::new(0, 0));
+        let player: Option<&Entity> = world.on_coord(Coordinate::new(0.0, 0.0));
         assert!(player.is_some());
         if let Some(entity) = player {
             assert_eq!(entity.entity_type, EntityType::Player(1));
         }
 
-        let player2: Option<&Entity> = world.on_coord(Coordinate::new(1, 0));
+        let player2: Option<&Entity> = world.on_coord(Coordinate::new(1.0, 0.0));
         assert!(player2.is_some());
         if let Some(entity) = player2 {
             assert_eq!(entity.entity_type, EntityType::Player(2));
         }
 
-        let bandid: Option<&Entity> = world.on_coord(Coordinate::new(5, 1));
+        let bandid: Option<&Entity> = world.on_coord(Coordinate::new(5.0, 1.0));
         assert!(bandid.is_some());
         if let Some(entity) = bandid {
             assert_eq!(entity.entity_type, EntityType::Enemy('B'));
         }
 
-        let mountain: Option<&Entity> = world.on_coord(Coordinate::new(6, 1));
+        let mountain: Option<&Entity> = world.on_coord(Coordinate::new(6.0, 1.0));
         assert!(mountain.is_some());
         if let Some(entity) = mountain {
             assert_eq!(entity.entity_type, EntityType::Obstacle('#'));
         }
 
-        let water: Option<&Entity> = world.on_coord(Coordinate::new(7, 1));
+        let water: Option<&Entity> = world.on_coord(Coordinate::new(7.0, 1.0));
         assert!(water.is_some());
         if let Some(entity) = water {
             assert_eq!(entity.entity_type, EntityType::Hole('~'));

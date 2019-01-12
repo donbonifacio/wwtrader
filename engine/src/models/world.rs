@@ -46,9 +46,7 @@ impl World {
     }
 
     pub fn on_coord(&self, coord: Coordinate) -> Option<&Entity> {
-        self.entities
-            .values()
-            .find(|entity| entity.coord.x == coord.x && entity.coord.y == coord.y)
+        self.entities.values().find(|entity| entity.coord == coord)
     }
 
     pub fn update_entity(&mut self, entity: Entity) {
@@ -89,11 +87,11 @@ mod tests {
     fn register_entity() {
         let mut world: World = World::new();
 
-        let entity = world.register(Entity::new(0, Coordinate::new(0, 0)));
+        let entity = world.register(Entity::new(0, Coordinate::new(0.0, 0.0)));
         assert_eq!(1, entity.id);
         assert_eq!(entity.id, world.get_entity(entity.id).unwrap().id);
 
-        let entity2 = world.register(Entity::new(0, Coordinate::new(0, 0)));
+        let entity2 = world.register(Entity::new(0, Coordinate::new(0.0, 0.0)));
         assert_eq!(2, entity2.id);
         assert_eq!(entity2.id, world.entities[&entity2.id].id);
     }
