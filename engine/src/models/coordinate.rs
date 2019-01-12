@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Clone, Default, Debug, Copy)]
 pub struct Coordinate {
     pub x: f32,
@@ -5,6 +7,12 @@ pub struct Coordinate {
 }
 
 const ERROR_MARGIN: f32 = std::f32::EPSILON;
+
+impl fmt::Display for Coordinate {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Coord[x: {}, y: {}]", self.x, self.y)
+    }
+}
 
 impl Coordinate {
     /// Returns a new `Coordinate`

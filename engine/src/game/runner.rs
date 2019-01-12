@@ -1,16 +1,23 @@
 use actions::action::ActionData;
+use actions::movement;
 use actions::processor;
 use models::world::World;
 
-pub fn run(world: &mut World) {
+type Result<T> = std::result::Result<T, movement::MovementError>;
+
+pub fn run(world: &mut World) -> Result<()> {
     if !world.has_actions() {
-        return;
+        return Ok(());
     }
-    run_actions(world);
-    world.clear_actions();
+    let result = run_actions(world);
+    if result.is_ok() {
+        world.clear_actions();
+    }
+
+    result
 }
 
-fn run_actions(world: &mut World) {
+fn run_actions(world: &mut World) -> Result<()> {
     let actions = get_actions(world);
     processor::process_actions(world, &actions)
 }
@@ -37,7 +44,7 @@ mod tests {
         let move_right = movement::right(entity.id);
         world.register_action(move_right);
 
-        run(&mut world);
+        assert!(run(&mut world).is_ok());
 
         assert!(!world.has_actions());
 

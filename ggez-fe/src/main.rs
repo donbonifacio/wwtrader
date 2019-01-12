@@ -101,8 +101,14 @@ impl MainState {
 // that you can override if you wish, but the defaults are fine.
 impl event::EventHandler for MainState {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
-        engine::game::runner::run(&mut self.world);
-        Ok(())
+        match engine::game::runner::run(&mut self.world) {
+            Ok(_) => Ok(()),
+            Err(_) => {
+                // TODO: Handle this
+                println!("Error...");
+                Ok(())
+            }
+        }
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
