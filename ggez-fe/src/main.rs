@@ -103,9 +103,8 @@ impl event::EventHandler for MainState {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
         match engine::game::runner::run(&mut self.world) {
             Ok(_) => Ok(()),
-            Err(_) => {
-                // TODO: Handle this
-                println!("Error...");
+            Err(engine_error) => {
+                eprintln!("Turn processing failed: {}", engine_error);
                 Ok(())
             }
         }

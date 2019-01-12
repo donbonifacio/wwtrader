@@ -7,10 +7,9 @@ pub fn run(world: &mut World) -> EngineResult<()> {
     if !world.has_actions() {
         return Ok(());
     }
+
     let result = run_actions(world);
-    if result.is_ok() {
-        world.clear_actions();
-    }
+    world.clear_actions();
 
     result
 }
