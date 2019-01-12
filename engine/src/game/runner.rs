@@ -29,7 +29,7 @@ mod tests {
     #[test]
     fn run_actions() {
         let mut world: World = World::new();
-        let entity = world.register(Entity::new(0, Coordinate::new(0, 0)));
+        let entity = world.register(Entity::new(0, Coordinate::new(0.0, 0.0)));
 
         let move_down = movement::down(entity.id);
         world.register_action(move_down);
@@ -45,7 +45,7 @@ mod tests {
         assert!(entity_option.is_some());
 
         let entity = entity_option.unwrap();
-        assert_eq!(1, entity.coord.x);
-        assert_eq!(1, entity.coord.y);
+        assert!(entity.coord.is_at_x(1.0));
+        assert!(entity.coord.is_at_y(1.0));
     }
 }

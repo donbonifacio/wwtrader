@@ -79,8 +79,8 @@ impl MainState {
             },
         };
 
-        let x = START_X + f32::from(entity.coord.x) * ENTITY_SIZE + ENTITY_SIZE / 2.0;
-        let y = START_Y + f32::from(entity.coord.y) * ENTITY_SIZE + ENTITY_SIZE / 2.0;
+        let x = START_X + entity.coord.x * ENTITY_SIZE + ENTITY_SIZE / 2.0;
+        let y = START_Y + entity.coord.y * ENTITY_SIZE + ENTITY_SIZE / 2.0;
 
         let mesh = graphics::MeshBuilder::new()
             //.rectangle(graphics::DrawMode::Fill, graphics::Point2::new(100.0, 100.0), 100.0, 100.0, graphics::WHITE)

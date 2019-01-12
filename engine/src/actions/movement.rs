@@ -68,29 +68,29 @@ mod tests {
 
     #[test]
     fn go_left() {
-        expect_position(0, 0, left, -1, 0);
-        expect_position(1, 1, left, 0, 1);
+        expect_position(0.0, 0.0, left, -1.0, 0.0);
+        expect_position(1.0, 1.0, left, 0.0, 1.0);
     }
 
     #[test]
     fn go_right() {
-        expect_position(0, 0, right, 1, 0);
-        expect_position(1, 1, right, 2, 1);
+        expect_position(0.0, 0.0, right, 1.0, 0.0);
+        expect_position(1.0, 1.0, right, 2.0, 1.0);
     }
 
     #[test]
     fn go_down() {
-        expect_position(0, 0, down, 0, 1);
-        expect_position(1, 1, down, 1, 2);
+        expect_position(0.0, 0.0, down, 0.0, 1.0);
+        expect_position(1.0, 1.0, down, 1.0, 2.0);
     }
 
     #[test]
     fn go_up() {
-        expect_position(0, 0, up, 0, -1);
-        expect_position(1, 1, up, 1, 0);
+        expect_position(0.0, 0.0, up, 0.0, -1.0);
+        expect_position(1.0, 1.0, up, 1.0, 0.0);
     }
 
-    fn expect_position(x: i8, y: i8, f: fn(i32) -> ActionData, ex: i8, ey: i8) {
+    fn expect_position(x: f32, y: f32, f: fn(i32) -> ActionData, ex: f32, ey: f32) {
         let world: &mut World = &mut World::new();
         let entity = world.register(Entity::new(0, Coordinate::new(x, y)));
 
@@ -98,7 +98,7 @@ mod tests {
         process(world, left);
 
         let new_entity = world.get_entity(entity.id).unwrap();
-        assert_eq!(new_entity.coord.x, ex);
-        assert_eq!(new_entity.coord.y, ey);
+        assert!(new_entity.coord.is_at_x(ex));
+        assert!(new_entity.coord.is_at_y(ey));
     }
 }
