@@ -56,20 +56,20 @@ impl MainState {
     fn draw_entity(&self, ctx: &mut Context, entity: &Entity) -> GameResult<()> {
         let color = match entity.entity_type {
             EntityType::Player(1) => graphics::Color {
-                r: 6.0,
-                g: 6.0,
+                r: 1.0,
+                g: 1.0,
                 b: 1.0,
                 a: 1.0,
             },
             EntityType::Player(2) => graphics::Color {
                 r: 0.0,
-                g: 6.0,
+                g: 1.0,
                 b: 0.0,
                 a: 1.0,
             },
             EntityType::Player(_) => graphics::Color {
-                r: 6.0,
-                g: 6.0,
+                r: 1.0,
+                g: 1.0,
                 b: 1.0,
                 a: 1.0,
             },
