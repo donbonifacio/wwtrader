@@ -14,7 +14,8 @@ use engine::models::{Entity, EntityType};
 struct MainState {
     text: graphics::Text,
     world: engine::models::World,
-    player_id: i32,
+    first_player_id: i32,
+    second_player_id: i32,
 }
 
 impl MainState {
@@ -26,7 +27,7 @@ impl MainState {
 
         let world_data = [
             "               ",
-            " 1             ",
+            " 1           2 ",
             "               ",
             "      ~~~~##   ",
             "       ~~~~~#  ",
@@ -41,7 +42,8 @@ impl MainState {
         MainState {
             text,
             world: engine::serializers::basic::load(&world_data),
-            player_id: 1,
+            first_player_id: 1,
+            second_player_id: 2,
         }
     }
 }
@@ -53,9 +55,21 @@ const ENTITY_SIZE: f32 = 50.0;
 impl MainState {
     fn draw_entity(&self, ctx: &mut Context, entity: &Entity) -> GameResult<()> {
         let color = match entity.entity_type {
+            EntityType::Player(1) => graphics::Color {
+                r: 1.0,
+                g: 1.0,
+                b: 1.0,
+                a: 1.0,
+            },
+            EntityType::Player(2) => graphics::Color {
+                r: 0.0,
+                g: 1.0,
+                b: 0.0,
+                a: 1.0,
+            },
             EntityType::Player(_) => graphics::Color {
-                r: 6.0,
-                g: 6.0,
+                r: 1.0,
+                g: 1.0,
                 b: 1.0,
                 a: 1.0,
             },
@@ -144,19 +158,35 @@ impl event::EventHandler for MainState {
     fn key_up_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Up => {
-                let action = engine::actions::movement::up(self.player_id);
+                let action = engine::actions::movement::up(self.first_player_id);
                 self.world.register_action(action);
             }
             Keycode::Left => {
-                let action = engine::actions::movement::left(self.player_id);
+                let action = engine::actions::movement::left(self.first_player_id);
                 self.world.register_action(action);
             }
             Keycode::Right => {
-                let action = engine::actions::movement::right(self.player_id);
+                let action = engine::actions::movement::right(self.first_player_id);
                 self.world.register_action(action);
             }
             Keycode::Down => {
-                let action = engine::actions::movement::down(self.player_id);
+                let action = engine::actions::movement::down(self.first_player_id);
+                self.world.register_action(action);
+            }
+            Keycode::W => {
+                let action = engine::actions::movement::up(self.second_player_id);
+                self.world.register_action(action);
+            }
+            Keycode::A => {
+                let action = engine::actions::movement::left(self.second_player_id);
+                self.world.register_action(action);
+            }
+            Keycode::D => {
+                let action = engine::actions::movement::right(self.second_player_id);
+                self.world.register_action(action);
+            }
+            Keycode::S => {
+                let action = engine::actions::movement::down(self.second_player_id);
                 self.world.register_action(action);
             }
             _ => (),
