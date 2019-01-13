@@ -51,46 +51,40 @@ impl MainState {
 const START_X: f32 = 10.0;
 const START_Y: f32 = 90.0;
 const ENTITY_SIZE: f32 = 50.0;
+const GREEN: graphics::Color = graphics::Color {
+    r: 0.0,
+    g: 1.0,
+    b: 0.0,
+    a: 1.0,
+};
+const RED: graphics::Color = graphics::Color {
+    r: 1.0,
+    g: 0.0,
+    b: 0.0,
+    a: 1.0,
+};
+const GREY: graphics::Color = graphics::Color {
+    r: 0.5,
+    g: 0.5,
+    b: 0.5,
+    a: 1.0,
+};
+const PURPLE: graphics::Color = graphics::Color {
+    r: 0.2,
+    g: 0.2,
+    b: 0.8,
+    a: 1.0,
+};
 
 impl MainState {
     fn draw_entity(&self, ctx: &mut Context, entity: &Entity) -> GameResult<()> {
         let color = match entity.entity_type {
-            EntityType::Player(1) => graphics::Color {
-                r: 1.0,
-                g: 1.0,
-                b: 1.0,
-                a: 1.0,
-            },
-            EntityType::Player(2) => graphics::Color {
-                r: 0.0,
-                g: 1.0,
-                b: 0.0,
-                a: 1.0,
-            },
-            EntityType::Player(_) => graphics::Color {
-                r: 1.0,
-                g: 1.0,
-                b: 1.0,
-                a: 1.0,
-            },
-            EntityType::Enemy(_) => graphics::Color {
-                r: 1.0,
-                g: 0.0,
-                b: 0.0,
-                a: 1.0,
-            },
-            EntityType::Obstacle(_) => graphics::Color {
-                r: 0.5,
-                g: 0.5,
-                b: 0.5,
-                a: 1.0,
-            },
-            EntityType::Hole(_) => graphics::Color {
-                r: 0.2,
-                g: 0.2,
-                b: 0.8,
-                a: 1.0,
-            },
+            EntityType::Player(1) => graphics::WHITE,
+            EntityType::Player(2) => GREEN,
+            EntityType::Player(_) => graphics::WHITE,
+            EntityType::Enemy(_) => RED,
+            EntityType::Obstacle(_) => GREY,
+            EntityType::Hole(_) => PURPLE,
         };
 
         let x = START_X + entity.coord.x * ENTITY_SIZE + ENTITY_SIZE / 2.0;
