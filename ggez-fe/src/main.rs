@@ -19,11 +19,11 @@ struct MainState {
 }
 
 impl MainState {
-    fn new(ctx: &mut Context) -> MainState {
+    fn new(ctx: &mut Context) -> GameResult<MainState> {
         // The ttf file will be in your resources directory. Later, we
         // will mount that directory so we can omit it in the path here.
-        let font = graphics::Font::new(ctx, "/DejaVuSerif.ttf", 48).unwrap();
-        let text = graphics::Text::new(ctx, "Wild Wild Trader", &font).unwrap();
+        let font = graphics::Font::new(ctx, "/DejaVuSerif.ttf", 48)?;
+        let text = graphics::Text::new(ctx, "Wild Wild Trader", &font)?;
 
         let world_data = [
             "               ",
@@ -39,12 +39,12 @@ impl MainState {
         ]
         .join("\n");
 
-        MainState {
+        Ok(MainState {
             text,
             world: engine::serializers::basic::load(&world_data),
             first_player_id: 1,
             second_player_id: 2,
-        }
+        })
     }
 }
 
@@ -197,21 +197,30 @@ impl event::EventHandler for MainState {
 // do the work of creating our MainState and running our game.
 // * Then, just call `game.run()` which runs the `Game` mainloop.
 pub fn main() {
-    let c = conf::Conf::new();
-    let ctx = &mut Context::load_from_conf("helloworld", "ggez", c).unwrap();
+    let conf = conf::Conf::new();
 
-    // We add the CARGO_MANIFEST_DIR/resources to the filesystem's path
-    // so that ggez will look in our cargo project directory for files.
-    if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
-        let mut path = path::PathBuf::from(manifest_dir);
-        path.push("resources");
-        ctx.filesystem.mount(&path, true);
-    }
-
-    let state = &mut MainState::new(ctx);
-    if let Err(e) = event::run(ctx, state) {
-        println!("Error encountered: {}", e);
-    } else {
-        println!("Game exited cleanly.");
+    match Context::load_from_conf("Wild Wild Trader", "donbonifacio", conf) {
+        Ok(mut ctx) => {
+            let _ = env::var("CARGO_MANIFEST_DIR")
+                .map_err(|e| eprintln!("Unable to load environment variable: {}", e))
+                .and_then(|manifest_dir| {
+                    let mut path = path::PathBuf::from(manifest_dir);
+                    path.push("resources");
+                    ctx.filesystem.mount(&path, true);
+                    MainState::new(&mut ctx).map_err(|e| {
+                        eprintln!("Unable to create main state: {}", e);
+                    })
+                })
+                .and_then(|mut state| {
+                    event::run(&mut ctx, &mut state).map_err(|e| {
+                        eprintln!("Error encountered: {}", e);
+                    })
+                })
+                .unwrap();
+            println!("Game exited cleanly.");
+        }
+        Err(err) => {
+            eprintln!("Failed loading game from config: {}", err);
+        }
     }
 }
