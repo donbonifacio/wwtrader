@@ -91,7 +91,6 @@ impl MainState {
         let y = START_Y + entity.coord.y * ENTITY_SIZE + ENTITY_SIZE / 2.0;
 
         let mesh = graphics::MeshBuilder::new()
-            //.rectangle(graphics::DrawMode::Fill, graphics::Point2::new(100.0, 100.0), 100.0, 100.0, graphics::WHITE)
             .circle(DrawMode::Fill, Point2::new(x, y), ENTITY_SIZE / 2.0, 1.0)
             .build(ctx)?;
 
