@@ -8,6 +8,8 @@ use ggez::{Context, GameResult};
 use std::env;
 use std::path;
 
+use engine::controllers::{PlayerController, PlayerInput};
+use engine::models::direction::{DOWN, LEFT, RIGHT, UP};
 use engine::models::{Entity, EntityType};
 
 // First we make a structure to contain the game's state
@@ -164,39 +166,17 @@ impl event::EventHandler for MainState {
     }
 
     fn key_up_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+        let controller1 = PlayerController::new(self.first_player_id);
+        let controller2 = PlayerController::new(self.second_player_id);
         match keycode {
-            Keycode::Up => {
-                let action = engine::actions::movement::up(self.first_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::Left => {
-                let action = engine::actions::movement::left(self.first_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::Right => {
-                let action = engine::actions::movement::right(self.first_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::Down => {
-                let action = engine::actions::movement::down(self.first_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::W => {
-                let action = engine::actions::movement::up(self.second_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::A => {
-                let action = engine::actions::movement::left(self.second_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::D => {
-                let action = engine::actions::movement::right(self.second_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::S => {
-                let action = engine::actions::movement::down(self.second_player_id);
-                self.world.register_action(action);
-            }
+            Keycode::Up => controller1.run(&mut self.world, PlayerInput::new(UP)),
+            Keycode::Left => controller1.run(&mut self.world, PlayerInput::new(LEFT)),
+            Keycode::Right => controller1.run(&mut self.world, PlayerInput::new(RIGHT)),
+            Keycode::Down => controller1.run(&mut self.world, PlayerInput::new(DOWN)),
+            Keycode::W => controller2.run(&mut self.world, PlayerInput::new(UP)),
+            Keycode::A => controller2.run(&mut self.world, PlayerInput::new(LEFT)),
+            Keycode::D => controller2.run(&mut self.world, PlayerInput::new(RIGHT)),
+            Keycode::S => controller2.run(&mut self.world, PlayerInput::new(DOWN)),
             _ => (),
         }
     }
