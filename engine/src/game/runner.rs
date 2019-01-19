@@ -1,9 +1,9 @@
 use actions::action::ActionData;
 use actions::processor;
-use engine_result::EngineResult;
+use actions::result::ActionResult;
 use models::world::World;
 
-pub fn run(world: &mut World) -> EngineResult<()> {
+pub fn run(world: &mut World) -> ActionResult<()> {
     if !world.has_actions() {
         return Ok(());
     }
@@ -14,7 +14,7 @@ pub fn run(world: &mut World) -> EngineResult<()> {
     result
 }
 
-fn run_actions(world: &mut World) -> EngineResult<()> {
+fn run_actions(world: &mut World) -> ActionResult<()> {
     let actions = get_actions(world);
     processor::process_actions(world, &actions)
 }

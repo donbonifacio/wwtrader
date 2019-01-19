@@ -1,6 +1,6 @@
 use actions::action::{ActionData, ActionType};
-use engine_result::EngineResult;
-use error::EngineError;
+use actions::error::ActionError;
+use actions::result::ActionResult;
 use models::coordinate::Coordinate;
 use models::direction;
 use models::direction::Direction;
@@ -38,7 +38,7 @@ pub fn down(entity_id: i32) -> ActionData {
     }
 }
 
-pub fn process(world: &mut World, action: ActionData) -> EngineResult<()> {
+pub fn process(world: &mut World, action: ActionData) -> ActionResult<()> {
     let entity = world.get_entity(action.entity_id)?;
 
     if let Some(dir) = action.direction {
@@ -54,17 +54,17 @@ pub fn process(world: &mut World, action: ActionData) -> EngineResult<()> {
     Ok(())
 }
 
-fn is_inside_world(world: &World, coord: Coordinate) -> EngineResult<()> {
+fn is_inside_world(world: &World, coord: Coordinate) -> ActionResult<()> {
     if !coord.is_within(world.left_edge, world.right_edge) {
-        Err(EngineError::OutOfMapCoordinate(coord.x, coord.y))
+        Err(ActionError::OutOfMapCoordinate(coord.x, coord.y))
     } else {
         Ok(())
     }
 }
 
-fn is_position_available(world: &World, coord: Coordinate) -> EngineResult<()> {
+fn is_position_available(world: &World, coord: Coordinate) -> ActionResult<()> {
     match world.on_coord(coord) {
-        Some(_) => Err(EngineError::PositionOccupied(coord.x, coord.y)),
+        Some(_) => Err(ActionError::PositionOccupied(coord.x, coord.y)),
         None => Ok(()),
     }
 }
@@ -79,7 +79,7 @@ pub fn operate(coord: Coordinate, direction: Direction) -> Coordinate {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use error::EngineError;
+    use actions::error::ActionError;
     use models::coordinate::Coordinate;
     use models::entity::Entity;
 
@@ -88,7 +88,7 @@ mod tests {
         let world: &mut World = &mut World::new();
         let left = left(1234);
         let result = process(world, left);
-        assert_eq!(result.err(), Some(EngineError::InvalidEntityId(1234)));
+        assert_eq!(result.err(), Some(ActionError::InvalidEntityId(1234)));
     }
 
     #[test]
@@ -124,7 +124,7 @@ mod tests {
         let action = down(entity1.id);
         let result = process(world, action);
         assert!(result.is_err());
-        assert_eq!(result.err(), Some(EngineError::PositionOccupied(1.0, 2.0)));
+        assert_eq!(result.err(), Some(ActionError::PositionOccupied(1.0, 2.0)));
 
         let new_entity = world.get_entity(entity1.id).unwrap();
         assert!(new_entity.coord.is_at_x(1.0));
@@ -144,25 +144,25 @@ mod tests {
             world,
             Coordinate::new(0.0, 0.0),
             up,
-            EngineError::OutOfMapCoordinate(0.0, -1.0),
+            ActionError::OutOfMapCoordinate(0.0, -1.0),
         );
         expect_error(
             world,
             Coordinate::new(0.0, 0.0),
             left,
-            EngineError::OutOfMapCoordinate(-1.0, 0.0),
+            ActionError::OutOfMapCoordinate(-1.0, 0.0),
         );
         expect_error(
             world,
             edge,
             right,
-            EngineError::OutOfMapCoordinate(edge.x + 1.0, edge.y),
+            ActionError::OutOfMapCoordinate(edge.x + 1.0, edge.y),
         );
         expect_error(
             world,
             edge,
             down,
-            EngineError::OutOfMapCoordinate(edge.x, edge.y + 1.0),
+            ActionError::OutOfMapCoordinate(edge.x, edge.y + 1.0),
         );
     }
 
@@ -182,7 +182,7 @@ mod tests {
         world: &mut World,
         position: Coordinate,
         f: fn(i32) -> ActionData,
-        error: EngineError,
+        error: ActionError,
     ) {
         let entity = world.register(Entity::new(0, position));
 
