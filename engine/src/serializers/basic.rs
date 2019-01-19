@@ -5,9 +5,9 @@ use models::world::World;
 
 pub fn print(world: &World) -> String {
     let mut lines: Vec<String> = vec![];
-    for y in 0..world.size_y {
+    for y in 0..world.right_edge.y as i32 {
         let mut line: Vec<String> = vec![];
-        for x in 0..world.size_x {
+        for x in 0..world.right_edge.x as i32 {
             line.push(coord_to_str(&world, x as f32, y as f32));
         }
         lines.push(line.join(""));
@@ -31,7 +31,8 @@ fn coord_to_str(world: &World, x: f32, y: f32) -> String {
 pub fn load(raw: &str) -> World {
     let lines: Vec<&str> = raw.split('\n').collect();
 
-    let mut world = World::create(lines[0].len(), lines.len());
+    let edge = Coordinate::new(lines[0].len() as f32, lines.len() as f32);
+    let mut world = World::create(edge.translate(-1.0, -1.0));
 
     lines
         .iter()
@@ -99,8 +100,8 @@ mod tests {
     fn load_empty_world() {
         let world = load(&["        ", "        "].join("\n"));
 
-        assert_eq!(world.size_x, 8);
-        assert_eq!(world.size_y, 2);
+        assert!(world.right_edge.is_at_x(7.0));
+        assert!(world.right_edge.is_at_y(1.0));
         assert_eq!(world.has_actions(), false);
     }
 
@@ -108,8 +109,8 @@ mod tests {
     fn load_world_with_actors() {
         let world = load(&["12      ", "     B#~"].join("\n"));
 
-        assert_eq!(world.size_x, 8);
-        assert_eq!(world.size_y, 2);
+        assert!(world.right_edge.is_at_x(7.0));
+        assert!(world.right_edge.is_at_y(1.0));
         assert_eq!(world.has_actions(), false);
 
         let player: Option<&Entity> = world.on_coord(Coordinate::new(0.0, 0.0));

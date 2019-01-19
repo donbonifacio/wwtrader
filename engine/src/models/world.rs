@@ -7,8 +7,8 @@ use models::entity::Entity;
 #[derive(Clone)]
 pub struct World {
     current_id: i32,
-    pub size_x: usize,
-    pub size_y: usize,
+    pub left_edge: Coordinate,
+    pub right_edge: Coordinate,
     pub entities: HashMap<i32, Entity>,
     actions: Vec<ActionData>,
 }
@@ -17,8 +17,8 @@ impl Default for World {
     fn default() -> World {
         World {
             current_id: 0,
-            size_x: 8,
-            size_y: 4,
+            left_edge: Coordinate::new(0.0, 0.0),
+            right_edge: Coordinate::new(8.0, 4.0),
             entities: HashMap::new(),
             actions: vec![],
         }
@@ -33,10 +33,9 @@ impl World {
         }
     }
 
-    pub fn create(w: usize, h: usize) -> World {
+    pub fn create(edge: Coordinate) -> World {
         World {
-            size_x: w,
-            size_y: h,
+            right_edge: edge,
             ..Default::default()
         }
     }

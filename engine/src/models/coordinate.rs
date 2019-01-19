@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Clone, Default, Debug, Copy)]
 pub struct Coordinate {
     pub x: f32,
@@ -6,10 +8,20 @@ pub struct Coordinate {
 
 const ERROR_MARGIN: f32 = std::f32::EPSILON;
 
+impl fmt::Display for Coordinate {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Coord[x: {}, y: {}]", self.x, self.y)
+    }
+}
+
 impl Coordinate {
     /// Returns a new `Coordinate`
     pub fn new(x: f32, y: f32) -> Coordinate {
         Coordinate { x, y }
+    }
+
+    pub fn translate(self, dx: f32, dy: f32) -> Coordinate {
+        Coordinate::new(self.x + dx, self.y + dy)
     }
 
     pub fn is_adjacent(self, other: Coordinate) -> bool {
@@ -24,6 +36,10 @@ impl Coordinate {
 
     pub fn is_at_y(self, y: f32) -> bool {
         (self.y - y).abs() < ERROR_MARGIN
+    }
+
+    pub fn is_within(self, left: Coordinate, right: Coordinate) -> bool {
+        !(self.x < left.x || self.y < left.y || self.x > right.x || self.y > right.y)
     }
 }
 
@@ -63,6 +79,22 @@ mod tests {
 
         assert!(coord1 == coord2);
         assert!(coord2 != coord3);
+    }
+
+    #[test]
+    fn is_within() {
+        let left_edge = Coordinate::new(0.0, 0.0);
+        let right_edge = Coordinate::new(8.0, 8.0);
+
+        assert!(Coordinate::new(1.0, 1.0).is_within(left_edge, right_edge));
+        assert!(Coordinate::new(4.0, 6.0).is_within(left_edge, right_edge));
+        assert!(left_edge.is_within(left_edge, right_edge));
+        assert!(right_edge.is_within(left_edge, right_edge));
+
+        assert!(!Coordinate::new(-1.0, 0.0).is_within(left_edge, right_edge));
+        assert!(!Coordinate::new(-9.0, 0.0).is_within(left_edge, right_edge));
+        assert!(!Coordinate::new(0.0, -10.0).is_within(left_edge, right_edge));
+        assert!(!Coordinate::new(4.0, 10.0).is_within(left_edge, right_edge));
     }
 
     #[test]

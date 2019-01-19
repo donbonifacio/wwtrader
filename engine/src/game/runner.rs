@@ -1,16 +1,20 @@
 use actions::action::ActionData;
 use actions::processor;
+use actions::result::ActionResult;
 use models::world::World;
 
-pub fn run(world: &mut World) {
+pub fn run(world: &mut World) -> ActionResult<()> {
     if !world.has_actions() {
-        return;
+        return Ok(());
     }
-    run_actions(world);
+
+    let result = run_actions(world);
     world.clear_actions();
+
+    result
 }
 
-fn run_actions(world: &mut World) {
+fn run_actions(world: &mut World) -> ActionResult<()> {
     let actions = get_actions(world);
     processor::process_actions(world, &actions)
 }
@@ -37,7 +41,7 @@ mod tests {
         let move_right = movement::right(entity.id);
         world.register_action(move_right);
 
-        run(&mut world);
+        assert!(run(&mut world).is_ok());
 
         assert!(!world.has_actions());
 

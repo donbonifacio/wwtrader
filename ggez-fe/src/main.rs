@@ -115,8 +115,13 @@ impl MainState {
 // that you can override if you wish, but the defaults are fine.
 impl event::EventHandler for MainState {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
-        engine::game::runner::run(&mut self.world);
-        Ok(())
+        match engine::game::runner::run(&mut self.world) {
+            Ok(_) => Ok(()),
+            Err(engine_error) => {
+                eprintln!("Turn processing failed: {}", engine_error);
+                Ok(())
+            }
+        }
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
@@ -132,16 +137,19 @@ impl event::EventHandler for MainState {
         }
 
         graphics::set_color(ctx, graphics::WHITE)?;
+
+        // Because the border is one coordinate ahead
+        let right_edge = self.world.right_edge.translate(1.0, 1.0);
         let board = graphics::MeshBuilder::new()
             .line(
                 &[
                     Point2::new(START_X, START_Y),
-                    Point2::new(START_X + (self.world.size_x as f32) * ENTITY_SIZE, START_Y),
+                    Point2::new(START_X + right_edge.x * ENTITY_SIZE, START_Y),
                     Point2::new(
-                        START_X + (self.world.size_x as f32) * ENTITY_SIZE,
-                        START_Y + (self.world.size_y as f32) * ENTITY_SIZE,
+                        START_X + right_edge.x * ENTITY_SIZE,
+                        START_Y + right_edge.y * ENTITY_SIZE,
                     ),
-                    Point2::new(START_X, START_Y + (self.world.size_y as f32) * ENTITY_SIZE),
+                    Point2::new(START_X, START_Y + right_edge.y * ENTITY_SIZE),
                     Point2::new(START_X, START_Y),
                 ],
                 4.0,

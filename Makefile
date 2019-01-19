@@ -5,7 +5,7 @@ run: ## Runs the game.
 	cargo run -p ggez-fe
 
 test: ## Runs the test suite.
-	cargo test
+	RUST_BACKTRACE=1 cargo test
 
 lint: ## Checks lint rules.
 	cargo fmt --all -- --check
