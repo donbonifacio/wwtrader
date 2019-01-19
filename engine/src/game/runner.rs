@@ -45,10 +45,10 @@ mod tests {
 
         assert!(!world.has_actions());
 
-        let entity_result = world.get_entity(entity.id);
-        assert!(entity_result.is_ok());
+        let entity_option = world.get_entity(entity.id);
+        assert!(entity_option.is_some());
 
-        let entity = entity_result.unwrap();
+        let entity = entity_option.unwrap();
         assert!(entity.coord.is_at_x(1.0));
         assert!(entity.coord.is_at_y(1.0));
     }

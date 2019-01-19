@@ -4,6 +4,7 @@ use actions::result::ActionResult;
 use models::coordinate::Coordinate;
 use models::direction;
 use models::direction::Direction;
+use models::entity::Entity;
 use models::world::World;
 
 pub fn left(entity_id: i32) -> ActionData {
@@ -38,8 +39,16 @@ pub fn down(entity_id: i32) -> ActionData {
     }
 }
 
+fn get_entity(world: &World, entity_id: i32) -> ActionResult<Entity> {
+    if let Some(entity) = world.get_entity(entity_id) {
+        return Ok(entity);
+    }
+
+    Err(ActionError::InvalidEntityId(entity_id))
+}
+
 pub fn process(world: &mut World, action: ActionData) -> ActionResult<()> {
-    let entity = world.get_entity(action.entity_id)?;
+    let entity = get_entity(world, action.entity_id)?;
 
     if let Some(dir) = action.direction {
         let new_coord = operate(entity.coord, dir);
