@@ -33,6 +33,10 @@ impl Coordinate {
     pub fn is_at_y(self, y: f32) -> bool {
         (self.y - y).abs() < ERROR_MARGIN
     }
+
+    pub fn is_within(self, left: Coordinate, right: Coordinate) -> bool {
+        !(self.x < left.x || self.y < left.y || self.x > right.x || self.y > right.y)
+    }
 }
 
 impl PartialEq for Coordinate {
@@ -71,6 +75,22 @@ mod tests {
 
         assert!(coord1 == coord2);
         assert!(coord2 != coord3);
+    }
+
+    #[test]
+    fn is_within() {
+        let left_edge = Coordinate::new(0.0, 0.0);
+        let right_edge = Coordinate::new(8.0, 8.0);
+
+        assert!(Coordinate::new(1.0, 1.0).is_within(left_edge, right_edge));
+        assert!(Coordinate::new(4.0, 6.0).is_within(left_edge, right_edge));
+        assert!(left_edge.is_within(left_edge, right_edge));
+        assert!(right_edge.is_within(left_edge, right_edge));
+
+        assert!(!Coordinate::new(-1.0, 0.0).is_within(left_edge, right_edge));
+        assert!(!Coordinate::new(-9.0, 0.0).is_within(left_edge, right_edge));
+        assert!(!Coordinate::new(0.0, -10.0).is_within(left_edge, right_edge));
+        assert!(!Coordinate::new(4.0, 10.0).is_within(left_edge, right_edge));
     }
 
     #[test]

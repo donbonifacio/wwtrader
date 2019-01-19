@@ -55,15 +55,11 @@ pub fn process(world: &mut World, action: ActionData) -> EngineResult<()> {
 }
 
 fn is_inside_world(world: &World, coord: Coordinate) -> EngineResult<()> {
-    if coord.x < 0.0
-        || coord.y < 0.0
-        || coord.x >= world.size_x as f32
-        || coord.y >= world.size_y as f32
-    {
-        return Err(EngineError::OutOfMapCoordinate(coord.x, coord.y));
+    if !coord.is_within(world.left_edge, world.right_edge) {
+        Err(EngineError::OutOfMapCoordinate(coord.x, coord.y))
+    } else {
+        Ok(())
     }
-
-    Ok(())
 }
 
 fn is_position_available(world: &World, coord: Coordinate) -> EngineResult<()> {
@@ -141,37 +137,32 @@ mod tests {
 
     #[test]
     fn world_ends_error() {
-        const SIZE_X: i8 = 8;
-        const SIZE_Y: i8 = 8;
-        let world: &mut World = &mut World::create(SIZE_X as usize, SIZE_Y as usize);
+        let edge = Coordinate::new(8.0, 8.0);
+        let world: &mut World = &mut World::create(edge);
 
         expect_error(
             world,
-            0.0,
-            0.0,
+            Coordinate::new(0.0, 0.0),
             up,
             EngineError::OutOfMapCoordinate(0.0, -1.0),
         );
         expect_error(
             world,
-            0.0,
-            0.0,
+            Coordinate::new(0.0, 0.0),
             left,
             EngineError::OutOfMapCoordinate(-1.0, 0.0),
         );
         expect_error(
             world,
-            f32::from(SIZE_X),
-            f32::from(SIZE_Y),
+            edge,
             right,
-            EngineError::OutOfMapCoordinate((SIZE_X + 1).into(), SIZE_Y.into()),
+            EngineError::OutOfMapCoordinate(edge.x + 1.0, edge.y),
         );
         expect_error(
             world,
-            f32::from(SIZE_X),
-            f32::from(SIZE_Y),
+            edge,
             down,
-            EngineError::OutOfMapCoordinate(SIZE_X.into(), (SIZE_Y + 1).into()),
+            EngineError::OutOfMapCoordinate(edge.x, edge.y + 1.0),
         );
     }
 
@@ -189,20 +180,18 @@ mod tests {
 
     fn expect_error(
         world: &mut World,
-        x: f32,
-        y: f32,
+        position: Coordinate,
         f: fn(i32) -> ActionData,
         error: EngineError,
     ) {
-        let entity = world.register(Entity::new(0, Coordinate::new(x, y)));
+        let entity = world.register(Entity::new(0, position));
 
         let op = f(entity.id);
         let result = process(world, op);
-        assert!(result.is_err());
         assert_eq!(result.err(), Some(error));
 
         let new_entity = world.get_entity(entity.id).unwrap();
-        assert!(new_entity.coord.is_at_x(x));
-        assert!(new_entity.coord.is_at_y(y));
+        assert!(new_entity.coord.is_at_x(position.x));
+        assert!(new_entity.coord.is_at_y(position.y));
     }
 }

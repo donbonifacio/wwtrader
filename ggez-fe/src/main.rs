@@ -127,12 +127,12 @@ impl event::EventHandler for MainState {
             .line(
                 &[
                     Point2::new(START_X, START_Y),
-                    Point2::new(START_X + (self.world.size_x as f32) * ENTITY_SIZE, START_Y),
+                    Point2::new(START_X + self.world.right_edge.x * ENTITY_SIZE, START_Y),
                     Point2::new(
-                        START_X + (self.world.size_x as f32) * ENTITY_SIZE,
-                        START_Y + (self.world.size_y as f32) * ENTITY_SIZE,
+                        START_X + self.world.right_edge.x * ENTITY_SIZE,
+                        START_Y + self.world.right_edge.y * ENTITY_SIZE,
                     ),
-                    Point2::new(START_X, START_Y + (self.world.size_y as f32) * ENTITY_SIZE),
+                    Point2::new(START_X, START_Y + self.world.right_edge.y * ENTITY_SIZE),
                     Point2::new(START_X, START_Y),
                 ],
                 4.0,
