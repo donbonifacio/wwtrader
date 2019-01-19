@@ -20,6 +20,10 @@ impl Coordinate {
         Coordinate { x, y }
     }
 
+    pub fn translate(self, dx: f32, dy: f32) -> Coordinate {
+        Coordinate::new(self.x + dx, self.y + dy)
+    }
+
     pub fn is_adjacent(self, other: Coordinate) -> bool {
         let dx: f32 = self.x - other.x;
         let dy: f32 = self.y - other.y;

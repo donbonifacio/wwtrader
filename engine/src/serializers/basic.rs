@@ -32,7 +32,7 @@ pub fn load(raw: &str) -> World {
     let lines: Vec<&str> = raw.split('\n').collect();
 
     let edge = Coordinate::new(lines[0].len() as f32, lines.len() as f32);
-    let mut world = World::create(edge);
+    let mut world = World::create(edge.translate(-1.0, -1.0));
 
     lines
         .iter()
@@ -100,8 +100,8 @@ mod tests {
     fn load_empty_world() {
         let world = load(&["        ", "        "].join("\n"));
 
-        assert!(world.right_edge.is_at_x(8.0));
-        assert!(world.right_edge.is_at_y(2.0));
+        assert!(world.right_edge.is_at_x(7.0));
+        assert!(world.right_edge.is_at_y(1.0));
         assert_eq!(world.has_actions(), false);
     }
 
@@ -109,8 +109,8 @@ mod tests {
     fn load_world_with_actors() {
         let world = load(&["12      ", "     B#~"].join("\n"));
 
-        assert!(world.right_edge.is_at_x(8.0));
-        assert!(world.right_edge.is_at_y(2.0));
+        assert!(world.right_edge.is_at_x(7.0));
+        assert!(world.right_edge.is_at_y(1.0));
         assert_eq!(world.has_actions(), false);
 
         let player: Option<&Entity> = world.on_coord(Coordinate::new(0.0, 0.0));
