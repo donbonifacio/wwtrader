@@ -19,11 +19,11 @@ struct MainState {
 }
 
 impl MainState {
-    fn new(ctx: &mut Context) -> MainState {
+    fn new(ctx: &mut Context) -> GameResult<MainState> {
         // The ttf file will be in your resources directory. Later, we
         // will mount that directory so we can omit it in the path here.
-        let font = graphics::Font::new(ctx, "/DejaVuSerif.ttf", 48).unwrap();
-        let text = graphics::Text::new(ctx, "Wild Wild Trader", &font).unwrap();
+        let font = graphics::Font::new(ctx, "/DejaVuSerif.ttf", 48)?;
+        let text = graphics::Text::new(ctx, "Wild Wild Trader", &font)?;
 
         let world_data = [
             "               ",
@@ -39,65 +39,58 @@ impl MainState {
         ]
         .join("\n");
 
-        MainState {
+        Ok(MainState {
             text,
             world: engine::serializers::basic::load(&world_data),
             first_player_id: 1,
             second_player_id: 2,
-        }
+        })
     }
 }
 
 const START_X: f32 = 10.0;
 const START_Y: f32 = 90.0;
 const ENTITY_SIZE: f32 = 50.0;
+const GREEN: graphics::Color = graphics::Color {
+    r: 0.0,
+    g: 1.0,
+    b: 0.0,
+    a: 1.0,
+};
+const RED: graphics::Color = graphics::Color {
+    r: 1.0,
+    g: 0.0,
+    b: 0.0,
+    a: 1.0,
+};
+const GREY: graphics::Color = graphics::Color {
+    r: 0.5,
+    g: 0.5,
+    b: 0.5,
+    a: 1.0,
+};
+const PURPLE: graphics::Color = graphics::Color {
+    r: 0.2,
+    g: 0.2,
+    b: 0.8,
+    a: 1.0,
+};
 
 impl MainState {
     fn draw_entity(&self, ctx: &mut Context, entity: &Entity) -> GameResult<()> {
         let color = match entity.entity_type {
-            EntityType::Player(1) => graphics::Color {
-                r: 1.0,
-                g: 1.0,
-                b: 1.0,
-                a: 1.0,
-            },
-            EntityType::Player(2) => graphics::Color {
-                r: 0.0,
-                g: 1.0,
-                b: 0.0,
-                a: 1.0,
-            },
-            EntityType::Player(_) => graphics::Color {
-                r: 1.0,
-                g: 1.0,
-                b: 1.0,
-                a: 1.0,
-            },
-            EntityType::Enemy(_) => graphics::Color {
-                r: 1.0,
-                g: 0.0,
-                b: 0.0,
-                a: 1.0,
-            },
-            EntityType::Obstacle(_) => graphics::Color {
-                r: 0.5,
-                g: 0.5,
-                b: 0.5,
-                a: 1.0,
-            },
-            EntityType::Hole(_) => graphics::Color {
-                r: 0.2,
-                g: 0.2,
-                b: 0.8,
-                a: 1.0,
-            },
+            EntityType::Player(1) => graphics::WHITE,
+            EntityType::Player(2) => GREEN,
+            EntityType::Player(_) => graphics::WHITE,
+            EntityType::Enemy(_) => RED,
+            EntityType::Obstacle(_) => GREY,
+            EntityType::Hole(_) => PURPLE,
         };
 
         let x = START_X + entity.coord.x * ENTITY_SIZE + ENTITY_SIZE / 2.0;
         let y = START_Y + entity.coord.y * ENTITY_SIZE + ENTITY_SIZE / 2.0;
 
         let mesh = graphics::MeshBuilder::new()
-            //.rectangle(graphics::DrawMode::Fill, graphics::Point2::new(100.0, 100.0), 100.0, 100.0, graphics::WHITE)
             .circle(DrawMode::Fill, Point2::new(x, y), ENTITY_SIZE / 2.0, 1.0)
             .build(ctx)?;
 
@@ -211,21 +204,30 @@ impl event::EventHandler for MainState {
 // do the work of creating our MainState and running our game.
 // * Then, just call `game.run()` which runs the `Game` mainloop.
 pub fn main() {
-    let c = conf::Conf::new();
-    let ctx = &mut Context::load_from_conf("helloworld", "ggez", c).unwrap();
+    let conf = conf::Conf::new();
 
-    // We add the CARGO_MANIFEST_DIR/resources to the filesystem's path
-    // so that ggez will look in our cargo project directory for files.
-    if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
-        let mut path = path::PathBuf::from(manifest_dir);
-        path.push("resources");
-        ctx.filesystem.mount(&path, true);
-    }
-
-    let state = &mut MainState::new(ctx);
-    if let Err(e) = event::run(ctx, state) {
-        println!("Error encountered: {}", e);
-    } else {
-        println!("Game exited cleanly.");
+    match Context::load_from_conf("Wild Wild Trader", "donbonifacio", conf) {
+        Ok(mut ctx) => {
+            let _ = env::var("CARGO_MANIFEST_DIR")
+                .map_err(|e| eprintln!("Unable to load environment variable: {}", e))
+                .and_then(|manifest_dir| {
+                    let mut path = path::PathBuf::from(manifest_dir);
+                    path.push("resources");
+                    ctx.filesystem.mount(&path, true);
+                    MainState::new(&mut ctx).map_err(|e| {
+                        eprintln!("Unable to create main state: {}", e);
+                    })
+                })
+                .and_then(|mut state| {
+                    event::run(&mut ctx, &mut state).map_err(|e| {
+                        eprintln!("Error encountered: {}", e);
+                    })
+                })
+                .unwrap();
+            println!("Game exited cleanly.");
+        }
+        Err(err) => {
+            eprintln!("Failed loading game from config: {}", err);
+        }
     }
 }
