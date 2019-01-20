@@ -4,6 +4,7 @@ use std::fmt;
 #[derive(Debug, PartialEq)]
 pub enum ActionError {
     InvalidEntityId(i32),
+    EmptyTargetEntityId,
     OutOfMapCoordinate(f32, f32),
     PositionOccupied(f32, f32),
 }
@@ -12,6 +13,7 @@ impl fmt::Display for ActionError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             ActionError::InvalidEntityId(id) => write!(f, "Invalid entity: {}", id),
+            ActionError::EmptyTargetEntityId => write!(f, "No target entity id provided"),
             ActionError::OutOfMapCoordinate(x, y) => {
                 write!(f, "Coordinate is outside world: {},{}", x, y)
             }

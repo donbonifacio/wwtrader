@@ -52,6 +52,10 @@ impl World {
         self.entities.insert(entity.id, entity);
     }
 
+    pub fn remove_entity(&mut self, entity: Entity) {
+        self.entities.remove(&entity.id);
+    }
+
     pub fn register(&mut self, entity: Entity) -> Entity {
         self.current_id += 1;
         let new_entity: Entity = entity.with_id(self.current_id);
