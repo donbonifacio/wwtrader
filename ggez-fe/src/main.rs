@@ -5,17 +5,18 @@ use ggez::event::{self, Keycode, Mod};
 use ggez::graphics;
 use ggez::graphics::{DrawMode, Point2};
 use ggez::{Context, GameResult};
+use std::collections::HashMap;
 use std::env;
 use std::path;
 
+use engine::controllers::PlayerInput;
+use engine::models::direction::{DOWN, LEFT, RIGHT, UP};
 use engine::models::{Entity, EntityType};
 
 // First we make a structure to contain the game's state
 struct MainState {
     text: graphics::Text,
     world: engine::models::World,
-    first_player_id: i32,
-    second_player_id: i32,
 }
 
 impl MainState {
@@ -28,22 +29,20 @@ impl MainState {
         let world_data = [
             "               ",
             " 1           2 ",
-            "               ",
+            "      B        ",
             "      ~~~~##   ",
             "       ~~~~~#  ",
-            "               ",
+            "   B        B  ",
             "   #           ",
             "  ###          ",
             "   #     B     ",
-            "               ",
+            "   B           ",
         ]
         .join("\n");
 
         MainState {
             text,
             world: engine::serializers::basic::load(&world_data),
-            first_player_id: 1,
-            second_player_id: 2,
         }
     }
 }
@@ -164,41 +163,25 @@ impl event::EventHandler for MainState {
     }
 
     fn key_up_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
-        match keycode {
-            Keycode::Up => {
-                let action = engine::actions::movement::up(self.first_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::Left => {
-                let action = engine::actions::movement::left(self.first_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::Right => {
-                let action = engine::actions::movement::right(self.first_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::Down => {
-                let action = engine::actions::movement::down(self.first_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::W => {
-                let action = engine::actions::movement::up(self.second_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::A => {
-                let action = engine::actions::movement::left(self.second_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::D => {
-                let action = engine::actions::movement::right(self.second_player_id);
-                self.world.register_action(action);
-            }
-            Keycode::S => {
-                let action = engine::actions::movement::down(self.second_player_id);
-                self.world.register_action(action);
-            }
-            _ => (),
-        }
+        // TODO: move this config elsewhere
+        let mut input_config = HashMap::new();
+        if let Some(entity) = self.world.get_player(1) {
+            input_config.insert(Keycode::Up, (entity.id, UP));
+            input_config.insert(Keycode::Down, (entity.id, DOWN));
+            input_config.insert(Keycode::Left, (entity.id, LEFT));
+            input_config.insert(Keycode::Right, (entity.id, RIGHT));
+        };
+        if let Some(entity) = self.world.get_player(2) {
+            input_config.insert(Keycode::W, (entity.id, UP));
+            input_config.insert(Keycode::S, (entity.id, DOWN));
+            input_config.insert(Keycode::A, (entity.id, LEFT));
+            input_config.insert(Keycode::D, (entity.id, RIGHT));
+        };
+
+        if let Some((entity_id, dir)) = input_config.get(&keycode) {
+            self.world
+                .register_player_input(*entity_id, PlayerInput::new(*dir));
+        };
     }
 }
 

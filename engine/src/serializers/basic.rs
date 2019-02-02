@@ -1,3 +1,4 @@
+use controllers::player::PlayerController;
 use models::actors::{bandid, mountain, player, water};
 use models::coordinate::Coordinate;
 use models::entity::{Entity, EntityType};
@@ -56,7 +57,10 @@ fn load_line(world: &mut World, y: f32, raw: &str) {
         };
 
         if let Some(entity) = entity {
-            world.register(entity);
+            match entity.entity_type {
+                EntityType::Player(_) => PlayerController::register(world, entity),
+                _ => world.register(entity),
+            };
         }
     });
 }

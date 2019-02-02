@@ -1,10 +1,10 @@
 use actions::action::{ActionData, ActionType};
+use actions::common::get_entity;
 use actions::error::ActionError;
 use actions::result::ActionResult;
 use models::coordinate::Coordinate;
 use models::direction;
 use models::direction::Direction;
-use models::entity::Entity;
 use models::world::World;
 
 pub fn left(entity_id: i32) -> ActionData {
@@ -12,6 +12,7 @@ pub fn left(entity_id: i32) -> ActionData {
         entity_id,
         action_type: ActionType::Move,
         direction: Some(direction::LEFT),
+        ..Default::default()
     }
 }
 
@@ -20,6 +21,7 @@ pub fn right(entity_id: i32) -> ActionData {
         entity_id,
         action_type: ActionType::Move,
         direction: Some(direction::RIGHT),
+        ..Default::default()
     }
 }
 
@@ -28,6 +30,7 @@ pub fn up(entity_id: i32) -> ActionData {
         entity_id,
         action_type: ActionType::Move,
         direction: Some(direction::UP),
+        ..Default::default()
     }
 }
 
@@ -36,15 +39,8 @@ pub fn down(entity_id: i32) -> ActionData {
         entity_id,
         action_type: ActionType::Move,
         direction: Some(direction::DOWN),
+        ..Default::default()
     }
-}
-
-fn get_entity(world: &World, entity_id: i32) -> ActionResult<Entity> {
-    if let Some(entity) = world.get_entity(entity_id) {
-        return Ok(entity);
-    }
-
-    Err(ActionError::InvalidEntityId(entity_id))
 }
 
 pub fn process(world: &mut World, action: ActionData) -> ActionResult<()> {
@@ -79,10 +75,7 @@ fn is_position_available(world: &World, coord: Coordinate) -> ActionResult<()> {
 }
 
 pub fn operate(coord: Coordinate, direction: Direction) -> Coordinate {
-    Coordinate {
-        x: coord.x + direction.dx,
-        y: coord.y + direction.dy,
-    }
+    coord.translate(direction.dx, direction.dy)
 }
 
 #[cfg(test)]

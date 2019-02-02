@@ -1,4 +1,5 @@
 use models::coordinate::Coordinate;
+use std::fmt;
 
 #[derive(Clone, Debug, Copy, PartialEq)]
 pub enum EntityType {
@@ -13,6 +14,7 @@ pub struct Entity {
     pub id: i32,
     pub coord: Coordinate,
     pub entity_type: EntityType,
+    pub hit_points: Option<f32>,
 }
 
 impl Default for Entity {
@@ -21,6 +23,7 @@ impl Default for Entity {
             id: 0,
             coord: Coordinate::new(0.0, 0.0),
             entity_type: EntityType::Player(1),
+            hit_points: None,
         }
     }
 }
@@ -31,6 +34,7 @@ impl Entity {
             id,
             coord,
             entity_type: EntityType::Enemy('?'),
+            hit_points: None,
         }
     }
 
@@ -38,11 +42,28 @@ impl Entity {
         Entity { coord, ..*self }
     }
 
+    pub fn take_damage(&self, damage: f32) -> Entity {
+        self.hit_points.map_or(*self, |hit_points| Entity {
+            hit_points: Some(hit_points - damage),
+            ..*self
+        })
+    }
+
     pub fn with_id(&self, new_id: i32) -> Entity {
         Entity {
             id: new_id,
             ..*self
         }
+    }
+}
+
+impl fmt::Display for Entity {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "Entity[id: {}, type: {:?}, coord: {}, hit_points: {:?}]",
+            self.id, self.entity_type, self.coord, self.hit_points
+        )
     }
 }
 

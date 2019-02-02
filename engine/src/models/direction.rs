@@ -17,4 +17,11 @@ impl fmt::Display for Direction {
     }
 }
 
+impl PartialEq for Direction {
+    fn eq(&self, other: &Direction) -> bool {
+        self.dx == other.dx && self.dy == other.dy
+    }
+}
+
+impl Eq for Direction {}
 impl Direction {}

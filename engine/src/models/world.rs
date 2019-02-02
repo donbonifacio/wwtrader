@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
 use actions::action::ActionData;
+use controllers::player::{PlayerController, PlayerInput};
 use models::coordinate::Coordinate;
-use models::entity::Entity;
+use models::entity::{Entity, EntityType};
 
 #[derive(Clone)]
 pub struct World {
@@ -10,6 +11,8 @@ pub struct World {
     pub left_edge: Coordinate,
     pub right_edge: Coordinate,
     pub entities: HashMap<i32, Entity>,
+    pub player_controllers: Vec<PlayerController>,
+    pub player_inputs: HashMap<i32, PlayerInput>,
     actions: Vec<ActionData>,
 }
 
@@ -20,6 +23,8 @@ impl Default for World {
             left_edge: Coordinate::new(0.0, 0.0),
             right_edge: Coordinate::new(8.0, 4.0),
             entities: HashMap::new(),
+            player_controllers: vec![],
+            player_inputs: HashMap::new(),
             actions: vec![],
         }
     }
@@ -40,6 +45,14 @@ impl World {
         }
     }
 
+    pub fn register_player_input(&mut self, entity_id: i32, input: PlayerInput) {
+        self.player_inputs.insert(entity_id, input);
+    }
+
+    pub fn clear_player_inputs(&mut self) {
+        self.player_inputs.clear();
+    }
+
     pub fn get_entity(&self, entity_id: i32) -> Option<Entity> {
         self.entities.get(&entity_id).cloned()
     }
@@ -52,11 +65,29 @@ impl World {
         self.entities.insert(entity.id, entity);
     }
 
+    pub fn remove_entity(&mut self, entity: Entity) {
+        self.entities.remove(&entity.id);
+    }
+
     pub fn register(&mut self, entity: Entity) -> Entity {
         self.current_id += 1;
         let new_entity: Entity = entity.with_id(self.current_id);
         self.entities.insert(self.current_id, new_entity);
         new_entity
+    }
+
+    pub fn get_player(&self, player_number: i8) -> Option<Entity> {
+        self.entities
+            .values()
+            .find(|&entity| match entity.entity_type {
+                EntityType::Player(number) => number == player_number,
+                _ => false,
+            })
+            .cloned()
+    }
+
+    pub fn register_player(&mut self, controller: PlayerController) {
+        self.player_controllers.push(controller);
     }
 
     pub fn register_action(&mut self, action: ActionData) {

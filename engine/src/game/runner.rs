@@ -1,9 +1,12 @@
 use actions::action::ActionData;
 use actions::processor;
 use actions::result::ActionResult;
+use controllers::player::PlayerController;
 use models::world::World;
 
 pub fn run(world: &mut World) -> ActionResult<()> {
+    process_player_input(world);
+
     if !world.has_actions() {
         return Ok(());
     }
@@ -11,7 +14,29 @@ pub fn run(world: &mut World) -> ActionResult<()> {
     let result = run_actions(world);
     world.clear_actions();
 
+    world.clear_player_inputs();
+
     result
+}
+
+fn process_player_input(world: &mut World) {
+    // TODO: remove clone
+    for (entity_id, input) in world.player_inputs.clone().iter() {
+        if let Some(controller) = get_controller(world, *entity_id) {
+            controller.run(world, *input);
+        };
+    }
+}
+
+fn get_controller(world: &World, entity_id: i32) -> Option<PlayerController> {
+    // TODO: maybe index player controllers in the world?
+    for controller in world.player_controllers.iter() {
+        if controller.entity_id == entity_id {
+            return Some(*controller);
+        }
+    }
+
+    None
 }
 
 fn run_actions(world: &mut World) -> ActionResult<()> {

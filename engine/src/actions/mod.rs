@@ -1,4 +1,6 @@
 pub mod action;
+pub mod attack;
+pub mod common;
 pub mod error;
 pub mod movement;
 pub mod processor;
