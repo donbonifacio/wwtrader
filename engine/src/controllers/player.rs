@@ -1,6 +1,6 @@
 use actions;
 use actions::ActionData;
-use controllers::controller::Controller;
+use controllers::controller::{Controller, ControllerType};
 use models::direction;
 use models::direction::Direction;
 use models::entity::{Entity, EntityType};
@@ -8,7 +8,7 @@ use models::world::World;
 
 #[derive(Clone, Default, Debug, Copy)]
 pub struct PlayerController {
-    entity_id: i32,
+    pub entity_id: i32,
 }
 
 #[derive(Clone, Default, Debug, Copy)]
@@ -25,6 +25,13 @@ impl PlayerInput {
 impl PlayerController {
     pub fn new(entity_id: i32) -> PlayerController {
         PlayerController { entity_id }
+    }
+
+    pub fn register(world: &mut World, entity: Entity) -> Entity {
+        let entity = world.register(entity);
+        let controller = PlayerController::new(entity.id);
+        world.register_player(controller);
+        entity
     }
 
     pub fn run(self, world: &mut World, input: PlayerInput) {
@@ -77,4 +84,8 @@ impl PlayerController {
     }
 }
 
-impl Controller for PlayerController {}
+impl Controller for PlayerController {
+    fn get_type(self) -> ControllerType {
+        ControllerType::Player
+    }
+}
